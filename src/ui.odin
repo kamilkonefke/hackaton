@@ -15,5 +15,5 @@ ui_update :: proc() {
 
 
 ui_render :: proc() {
-    ui_clock({100, 100}, 1.0, 100.0)
+    ui_clock({100, 100}, 100.0, 20.0, "Test Label")
 }
