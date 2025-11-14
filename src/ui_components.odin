@@ -60,3 +60,16 @@ ui_clock :: proc(pos: rl.Vector2, max: f32, val: f32, label: string) -> bool {
 
     return false
 }
+
+TOGGLE_SIZE: f32 = 16
+
+ui_toggle_buildings :: proc() {
+    toggle_rect: rl.Rectangle = {
+        x = MARGIN,
+        y = VIRTUAL_HEIGHT - TOGGLE_SIZE - MARGIN,
+        width = TOGGLE_SIZE,
+        height = TOGGLE_SIZE,
+    }
+
+    rl.DrawRectangleRec(toggle_rect, COLOR_PURPLE)
+}
