@@ -1,5 +1,6 @@
 package main
 
+import "core:fmt"
 import "core:math/linalg"
 import rl "vendor:raylib"
 import "core:math"
@@ -7,12 +8,13 @@ import "core:math"
 GAP: f32 = 10.0
 MARGIN: f32 = 20.0
 
-CLOCK_SIZE: f32 = 30.0
+CLOCK_SIZE: f32 = 20.0
 CLOCK_BORDER: f32 = 2.0
 CLOCK_SEGMENTS: i32 = 40
 CLOCK_LINE_THICKNESS: f32 = 2.0
-CLOCK_DISPLAY_WARNING: f32 = 10.0
+CLOCK_DISPLAY_WARNING: f32 = 90.0
 CLOCK_PADDING: f32 = 8.0
+CLOCK_GAP: f32 = 5.0
 
 ui_clock :: proc(pos: rl.Vector2, max: f32, val: f32, label: string) -> bool {
     // Background
@@ -59,16 +61,16 @@ ui_clock :: proc(pos: rl.Vector2, max: f32, val: f32, label: string) -> bool {
 
     rl.DrawTextEx(font, label_text, {
         center_point.x - label_measure.x / 2,
-        center_point.y - CLOCK_SIZE - GAP - f32(gfx["warning_sign"].height)
+        center_point.y - CLOCK_SIZE - CLOCK_GAP - f32(gfx["warning_sign"].height)
     }, 12, 0, {
-        255,255,255,150
+        255,255,255,180
     })
 
     // Warning
     if percent * 100 <= CLOCK_DISPLAY_WARNING {
         rl.DrawTextureV(gfx["warning_sign"], {
-            center_point.x - label_measure.x - GAP,
-            center_point.y - CLOCK_SIZE - GAP - f32(label_measure.x)
+            center_point.x - label_measure.x - CLOCK_GAP * 2,
+            center_point.y - CLOCK_SIZE - CLOCK_GAP * 2 - f32(label_measure.x)
         }, rl.WHITE)
 
         if percent == 0 {   
@@ -79,10 +81,14 @@ ui_clock :: proc(pos: rl.Vector2, max: f32, val: f32, label: string) -> bool {
     return false
 }
 
-TOGGLE_SIZE: f32 = 16.0
+TOGGLE_SIZE: f32 = 12.0
 TOGGLE_PADDING: f32 = 4.0
-BUILDINGS_CONTAINER_HEIGHT: f32 = 70
+
+BUILDINGS_CONTAINER_HEIGHT: f32 = 50.0
 BUILDINGS_CONTAINER_WIDTH: f32 = VIRTUAL_WIDTH * 0.7
+BUILDINGS_CONTAINER_PADDING: f32 = 8.0
+BUILDINGS_CONTAINER_GAP: f32 = GAP * 2 
+BUILDINGS_CONTAINER_TEXTURE_SCALE: f32 = 2.0
 
 toggle_button_pos_target: rl.Vector2 = {
     MARGIN,
@@ -112,49 +118,62 @@ ui_toggle_buildings_render :: proc() {
 
     // Button
     rl.DrawRectangleRounded(toggle_rect, 0.25, 10, COLOR_PURPLE)
-    rl.DrawTextureV(toggle_button_icon, { toggle_rect.x + TOGGLE_PADDING, toggle_rect.y + TOGGLE_PADDING }, rl.Color{
-        255,255,255, 150
+    rl.DrawTextureEx(toggle_button_icon, { toggle_rect.x + TOGGLE_PADDING, toggle_rect.y + TOGGLE_PADDING }, 0, 1, rl.Color{
+        255,255,255, 180
     })
 }
 
 hovered_toggle := false
+
+ui_toggle_buildings :: proc() {
+    is_building_toggled = !is_building_toggled
+
+    // Container UP
+    if is_building_toggled {
+        toggle_button_icon = gfx["chevron_down"]
+        toggle_button_pos_target = {
+            MARGIN,
+            VIRTUAL_HEIGHT - TOGGLE_SIZE - MARGIN - TOGGLE_PADDING - BUILDINGS_CONTAINER_HEIGHT - GAP, 
+        }
+        buildings_container_pos_target = {
+            MARGIN,
+            VIRTUAL_HEIGHT - BUILDINGS_CONTAINER_HEIGHT - MARGIN
+        }
+        // Container DOWN
+    } else {
+        toggle_button_icon = gfx["chevron_up"]
+        toggle_button_pos_target = {
+            MARGIN,
+            VIRTUAL_HEIGHT - TOGGLE_SIZE - MARGIN - TOGGLE_PADDING,
+        }
+        buildings_container_pos_target = {
+            MARGIN,
+            VIRTUAL_HEIGHT
+        }
+    }
+}
 
 ui_toggle_buildings_update :: proc() {
     if rl.CheckCollisionPointRec(mouse_screen_position, toggle_rect) {
         hovered_toggle = true
         is_on_hover = true
         if rl.IsMouseButtonPressed(.LEFT) {
-            is_building_toggled = !is_building_toggled
-
-            // Container UP
-            if is_building_toggled {
-                toggle_button_icon = gfx["chevron_down"]
-                toggle_button_pos_target = {
-                    MARGIN,
-                    VIRTUAL_HEIGHT - TOGGLE_SIZE - MARGIN - TOGGLE_PADDING - BUILDINGS_CONTAINER_HEIGHT - GAP, 
-                }
-                buildings_container_pos_target = {
-                    MARGIN,
-                    VIRTUAL_HEIGHT - BUILDINGS_CONTAINER_HEIGHT - MARGIN
-                }
-                // Container DOWN
-            } else {
-                toggle_button_icon = gfx["chevron_up"]
-                toggle_button_pos_target = {
-                    MARGIN,
-                    VIRTUAL_HEIGHT - TOGGLE_SIZE - MARGIN - TOGGLE_PADDING,
-                }
-                buildings_container_pos_target = {
-                    MARGIN,
-                    VIRTUAL_HEIGHT
-                }
-            }
+            ui_toggle_buildings()
         }
     } else if hovered_toggle {
         is_on_hover = false
         hovered_toggle = false
     }
 }
+
+building_in_container :: struct {
+    pos: rl.Vector2,
+    building: Building 
+}
+
+buildings_in_container: [dynamic]building_in_container = {} 
+
+hovered_building := -1
 
 ui_buildings_container_render :: proc() {
     buildings_container_pos = linalg.lerp(buildings_container_pos, buildings_container_pos_target, f32(rl.GetFrameTime() * 10))
@@ -167,8 +186,41 @@ ui_buildings_container_render :: proc() {
 
     // Container Render
     rl.DrawRectangleRounded(container_rect, 0.25, 10, COLOR_PURPLE)
+
+    for element in buildings_in_container {
+        rl.DrawTextureEx(element.building.texture^, element.pos, 0, BUILDINGS_CONTAINER_TEXTURE_SCALE, rl.WHITE)
+    }
 }
 
 ui_buildings_container_update :: proc() {
+    if rl.IsKeyPressed(.TAB) {
+        ui_toggle_buildings()
+    }
 
+    new_pos: rl.Vector2 = {
+        buildings_container_pos.x + BUILDINGS_CONTAINER_PADDING,
+        buildings_container_pos.y + BUILDINGS_CONTAINER_HEIGHT / 2 - SPRITE_SIZE * BUILDINGS_CONTAINER_TEXTURE_SCALE / 2,
+    } 
+
+    for i in 0 ..< len(buildings_in_container) {
+        buildings_in_container[i].pos = new_pos
+       
+        if rl.CheckCollisionPointRec(mouse_screen_position, {
+            x = new_pos.x,
+            y = new_pos.y,
+            width = SPRITE_SIZE * BUILDINGS_CONTAINER_TEXTURE_SCALE,
+            height = SPRITE_SIZE * BUILDINGS_CONTAINER_TEXTURE_SCALE,
+        }) {
+            is_on_hover = true
+            hovered_building = i
+            if rl.IsMouseButtonPressed(.LEFT) {
+                selected_building = &buildings_in_container[i].building
+            }
+        } else if hovered_building == i {
+            is_on_hover = false
+            hovered_building = -1
+        } 
+
+        new_pos.x += SPRITE_SIZE * BUILDINGS_CONTAINER_TEXTURE_SCALE + BUILDINGS_CONTAINER_GAP
+    }
 }
