@@ -105,33 +105,42 @@ ui_toggle_buildings_render :: proc() {
     })
 }
 
-ui_toggle_buildings_update :: proc() {
-    if rl.CheckCollisionPointRec(mouse_screen_position, toggle_rect) && rl.IsMouseButtonPressed(.LEFT) {
-        is_building_toggled = !is_building_toggled
+hovered_toggle := false
 
-        // Container UP
-        if is_building_toggled {
-            toggle_button_icon = gfx["chevron_down"]
-            toggle_button_pos_target = {
-                MARGIN,
-                VIRTUAL_HEIGHT - TOGGLE_SIZE - MARGIN - TOGGLE_PADDING - BUILDINGS_CONTAINER_HEIGHT - GAP, 
-            }
-            buildings_container_pos_target = {
-                MARGIN,
-                VIRTUAL_HEIGHT - BUILDINGS_CONTAINER_HEIGHT - MARGIN
-            }
-        // Container DOWN
-        } else {
-            toggle_button_icon = gfx["chevron_up"]
-            toggle_button_pos_target = {
-                MARGIN,
-                VIRTUAL_HEIGHT - TOGGLE_SIZE - MARGIN - TOGGLE_PADDING,
-            }
-            buildings_container_pos_target = {
-                MARGIN,
-                VIRTUAL_HEIGHT
+ui_toggle_buildings_update :: proc() {
+    if rl.CheckCollisionPointRec(mouse_screen_position, toggle_rect) {
+        hovered_toggle = true
+        is_on_hover = true
+        if rl.IsMouseButtonPressed(.LEFT) {
+            is_building_toggled = !is_building_toggled
+
+            // Container UP
+            if is_building_toggled {
+                toggle_button_icon = gfx["chevron_down"]
+                toggle_button_pos_target = {
+                    MARGIN,
+                    VIRTUAL_HEIGHT - TOGGLE_SIZE - MARGIN - TOGGLE_PADDING - BUILDINGS_CONTAINER_HEIGHT - GAP, 
+                }
+                buildings_container_pos_target = {
+                    MARGIN,
+                    VIRTUAL_HEIGHT - BUILDINGS_CONTAINER_HEIGHT - MARGIN
+                }
+                // Container DOWN
+            } else {
+                toggle_button_icon = gfx["chevron_up"]
+                toggle_button_pos_target = {
+                    MARGIN,
+                    VIRTUAL_HEIGHT - TOGGLE_SIZE - MARGIN - TOGGLE_PADDING,
+                }
+                buildings_container_pos_target = {
+                    MARGIN,
+                    VIRTUAL_HEIGHT
+                }
             }
         }
+    } else if hovered_toggle {
+        is_on_hover = false
+        hovered_toggle = false
     }
 }
 
