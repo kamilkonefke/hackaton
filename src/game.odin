@@ -2,6 +2,7 @@ package main
 
 game_init :: proc() {
     buildings_init()
+    toggle_button_icon = gfx["chevron_up"]    
 }
 
 game_update :: proc() {

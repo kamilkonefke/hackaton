@@ -19,10 +19,14 @@ main_camera: rl.Camera2D = rl.Camera2D{
     zoom = 1.0,
 }
 
+is_on_hover: bool = false
+
 main :: proc() {
     rl.SetConfigFlags(rl.ConfigFlags{.VSYNC_HINT, .WINDOW_RESIZABLE})
     rl.InitWindow(1280, 720, "Hackaton")
     defer rl.CloseWindow()
+
+	rl.HideCursor()
 
     render_target := rl.LoadRenderTexture(VIRTUAL_WIDTH, VIRTUAL_HEIGHT)
     rl.SetTextureFilter(render_target.texture, .POINT)
@@ -58,6 +62,7 @@ main :: proc() {
             0.0,
             rl.WHITE
         )
+        draw_cursor()
         rl.EndDrawing()
     }
 }
