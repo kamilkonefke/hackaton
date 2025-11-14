@@ -12,35 +12,45 @@ CLOCK_BORDER: f32 = 2.0
 CLOCK_SEGMENTS: i32 = 40
 CLOCK_LINE_THICKNESS: f32 = 2.0
 CLOCK_DISPLAY_WARNING: f32 = 10.0
+CLOCK_PADDING: f32 = 8.0
 
 ui_clock :: proc(pos: rl.Vector2, max: f32, val: f32, label: string) -> bool {
+    // Background
+    background_rec: rl.Rectangle = {
+        x = pos.x - CLOCK_SIZE - CLOCK_BORDER - CLOCK_PADDING,
+        y = pos.y - CLOCK_SIZE * 2 - MARGIN,
+        width = (CLOCK_SIZE + CLOCK_BORDER) * 2 + CLOCK_PADDING * 2,
+        height = (CLOCK_SIZE + CLOCK_BORDER) * 2 + CLOCK_PADDING * 2,
+    }
+    rl.DrawRectangleRounded(background_rec, 0.20, 10, COLOR_PURPLE)
+    center_point: rl.Vector2 = {
+        background_rec.x + background_rec.width / 2,
+        background_rec.y + background_rec.height / 2 + CLOCK_SIZE
+    } 
     // Border
-    rl.DrawCircleSector(pos, CLOCK_SIZE + CLOCK_BORDER, 180, 360, CLOCK_SEGMENTS, rl.BLACK)
+    rl.DrawCircleSector(center_point, CLOCK_SIZE + CLOCK_BORDER, 180, 360, CLOCK_SEGMENTS, rl.BLACK)
     rl.DrawLineEx({
-        pos.x - CLOCK_SIZE - CLOCK_BORDER,
-        pos.y + 1 // 1 because to start after "main clock"
+        center_point.x - CLOCK_SIZE - CLOCK_BORDER,
+        center_point.y + 1 // 1 because to start after "main clock"
     }, {
-        pos.x + CLOCK_SIZE + CLOCK_BORDER,
-        pos.y + 1
+        center_point.x + CLOCK_SIZE + CLOCK_BORDER,
+        center_point.y + 1
     }, CLOCK_BORDER, rl.BLACK)
     
     // Main circle fill
-    rl.DrawCircleSector(pos, CLOCK_SIZE, 180, 360, CLOCK_SEGMENTS, COLOR_PURPLE)
+    rl.DrawCircleSector(center_point, CLOCK_SIZE, 180, 360, CLOCK_SEGMENTS, COLOR_BLUE)
     
     // Progress
     percent := val/max
     
     angle := ((180 * percent) + 180)
 
-    rl.DrawCircleSector({
-        pos.x,
-        pos.y
-    }, CLOCK_SIZE, 180, angle, 20, COLOR_INDIGO)
+    rl.DrawCircleSector(center_point, CLOCK_SIZE, 180, angle, 20, COLOR_INDIGO)
     
     line_angle := angle * rl.DEG2RAD
-    rl.DrawLineEx(pos, {
-        pos.x + math.cos(line_angle) * CLOCK_SIZE,
-        pos.y + math.sin(line_angle) * CLOCK_SIZE
+    rl.DrawLineEx(center_point, {
+        center_point.x + math.cos(line_angle) * CLOCK_SIZE,
+        center_point.y + math.sin(line_angle) * CLOCK_SIZE
     }, CLOCK_LINE_THICKNESS, rl.BLACK)
     
     // Label
@@ -48,18 +58,20 @@ ui_clock :: proc(pos: rl.Vector2, max: f32, val: f32, label: string) -> bool {
     label_measure := rl.MeasureTextEx(font, label_text, 12, 0)
 
     rl.DrawTextEx(font, label_text, {
-        pos.x - label_measure.x / 2,
-        pos.y - CLOCK_SIZE - GAP - label_measure.y
-    }, 12, 0, COLOR_PURPLE)
+        center_point.x - label_measure.x / 2,
+        center_point.y - CLOCK_SIZE - GAP - f32(gfx["warning_sign"].height)
+    }, 12, 0, {
+        255,255,255,150
+    })
 
     // Warning
-    if percent <= CLOCK_DISPLAY_WARNING {
+    if percent * 100 <= CLOCK_DISPLAY_WARNING {
         rl.DrawTextureV(gfx["warning_sign"], {
-            pos.x - f32(gfx["warning_sign"].width) / 2,
-            pos.y - CLOCK_SIZE - GAP * 2 - label_measure.y - f32(gfx["warning_sign"].height)
+            center_point.x - label_measure.x - GAP,
+            center_point.y - CLOCK_SIZE - GAP - f32(label_measure.x)
         }, rl.WHITE)
 
-        if percent == 0 {
+        if percent == 0 {   
             return true   
         }
     }
