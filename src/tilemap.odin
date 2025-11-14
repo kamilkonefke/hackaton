@@ -10,21 +10,39 @@ Tile :: struct {
     rotation: f32
 }
 
+TileGroup :: struct {
+    tiles: []Tile,
+    weight: f32
+}
+
 tilemap : [TILEMAP_WIDTH*TILEMAP_HEIGHT]Tile
 
 TILEMAP_WIDTH :: 256
 TILEMAP_HEIGHT :: 256
 
+TILEMAP_DRAW_OFFSET_X :: 8
+TILEMAP_DRAW_OFFSET_Y :: 8
+
 SPRITE_SIZE :: 16
 
-GROUND_TILES :: []Tile {
-    Tile{"ground", 0.0},
-    Tile{"ground", 90.0},
-    Tile{"ground", 180.0},
-    Tile{"ground", 270.0},
-    Tile{"water", 0.0},
-    Tile{"water", 270.0},
+GROUND_TILES :: []TileGroup {
+    // Default value if not found
+    TileGroup { tiles = {
+        Tile{"none", 0.0},
+    }, weight = 0.0},
+
+    TileGroup { tiles = {
+        Tile{"ground", 0.0},
+        Tile{"ground", 90.0},
+        Tile{"ground", 180.0},
+        Tile{"ground", 270.0},
+    }, weight = 5.0},
+    TileGroup { tiles = {
+        Tile{"water", 0.0}
+    }, weight = 1.0}
 }
+
+WEIGHT_SUM :: 6
 
 // USE: tilemap_generate(seed)
 // tilemap_render()
@@ -66,8 +84,8 @@ tilemap_render :: proc() {
             tile := tilemap_get_tile(x, y)
             tex, exists := gfx[tile.sprite]
 
-            xCoord: i32 = i32(x * SPRITE_SIZE)
-            yCoord: i32 = i32(y * SPRITE_SIZE)
+            xCoord: i32 = i32(x * SPRITE_SIZE) + TILEMAP_DRAW_OFFSET_X
+            yCoord: i32 = i32(y * SPRITE_SIZE) + TILEMAP_DRAW_OFFSET_Y
             if exists {
                 rl.DrawTexturePro(
                     tex,
@@ -85,10 +103,21 @@ tilemap_render :: proc() {
 @private
 map_f32_to_tile :: proc(value: f32) -> Tile {
     val := (value + 1) / 2 // between 0 and 1
-    len := f32(len(GROUND_TILES))
+    
+    random_weight := val * WEIGHT_SUM
 
-    sprite_id := int(math.floor(val * len))
+    prev_weight: f32 = 0.0
+    for t_group in GROUND_TILES {
+        if random_weight - prev_weight < t_group.weight {
+            inner_val := (random_weight - prev_weight) / t_group.weight // between 0 and 1
+            tiles := t_group.tiles
+            tiles_len := f32(len(tiles))
+            sprite_id := int(math.floor(inner_val * tiles_len))
+            return tiles[sprite_id]
+        }
 
-    tiles := GROUND_TILES
-    return tiles[sprite_id]
+        prev_weight += t_group.weight
+    }
+
+    return GROUND_TILES[0].tiles[0]
 }
