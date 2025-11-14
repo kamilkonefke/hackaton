@@ -3,6 +3,7 @@ package main
 import rl "vendor:raylib"
 import noise "core:math/noise"
 import "core:math"
+import "core:fmt"
 
 Tile :: struct {
     sprite: string,
@@ -21,6 +22,8 @@ GROUND_TILES :: []Tile {
     Tile{"ground", 90.0},
     Tile{"ground", 180.0},
     Tile{"ground", 270.0},
+    Tile{"water", 0.0},
+    Tile{"water", 270.0},
 }
 
 // USE: tilemap_generate(seed)
@@ -52,17 +55,14 @@ tilemap_generate :: proc(seed: i64) {
 }
 
 tilemap_render :: proc() {
-    offset_x := player_rect.x + main_camera.offset.x
-    offset_y := player_rect.y + main_camera.offset.y
-
-    startTileX := math.floor(main_camera.offset.x / SPRITE_SIZE) * SPRITE_SIZE
-    startTileY := math.floor(main_camera.offset.y / SPRITE_SIZE) * SPRITE_SIZE
+    startTileX := math.floor(main_camera.target.x / SPRITE_SIZE)
+    startTileY := math.floor(main_camera.target.y / SPRITE_SIZE)
 
     numTilesX := int(VIRTUAL_WIDTH / SPRITE_SIZE) + 2
     numTilesY := int(VIRTUAL_HEIGHT / SPRITE_SIZE) + 2
 
-    for y := int(startTileY); y < numTilesY; y+=1 {
-        for x := int(startTileX); x < numTilesX; x+=1 {
+    for y := int(startTileY); y < int(startTileY) + numTilesY; y+=1 {
+        for x := int(startTileX); x < int(startTileX) + numTilesX; x+=1 {
             tile := tilemap_get_tile(x, y)
             tex, exists := gfx[tile.sprite]
 

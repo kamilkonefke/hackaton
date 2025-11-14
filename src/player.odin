@@ -33,6 +33,8 @@ player_update :: proc() {
     player_rect.y = player_pos.y
 
     player_direction = player_rect.x - initial_pos_h >= 0
+
+    adjust_camera_to_player()
 }
 
 player_render :: proc() {
@@ -43,4 +45,9 @@ player_render :: proc() {
         } else{
             player_rect.width = -math.abs(player_rect.width)
         }
+}
+
+adjust_camera_to_player :: proc() {
+    main_camera.target.x = player_rect.x - (VIRTUAL_WIDTH / 2)
+    main_camera.target.y = player_rect.y - (VIRTUAL_HEIGHT / 2)
 }
