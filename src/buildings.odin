@@ -116,9 +116,11 @@ buildings_update :: proc() {
                 return
             }
 
-            building_copy: Building = selected_building^
-            building_copy.rect.x = cursor_position.x
-            building_copy.rect.y = cursor_position.y
+            building_cpy: Building = selected_building^
+            building_cpy.rect.x = cursor_position.x
+            building_cpy.rect.y = cursor_position.y
+            
+            money_update(100) // change to Building.cost
 
             append(&standing_buildings, building_copy)
         }
