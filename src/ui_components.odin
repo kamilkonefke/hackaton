@@ -53,8 +53,8 @@ ui_clock :: proc(pos: rl.Vector2, max: f32, val: f32, label: string) -> bool {
 
     if percent <= 10 {
         rl.DrawTextureV(gfx["warning_sign"], {
-            pos.x + label_measure.x / 2 + GAP,
-            pos.y - CLOCK_SIZE - GAP - f32(gfx["warning_sign"].height)
+            pos.x - f32(gfx["warning_sign"].width) / 2,
+            pos.y - CLOCK_SIZE - GAP * 2 - label_measure.y - f32(gfx["warning_sign"].height)
         }, rl.WHITE)
 
         if percent == 0 {
