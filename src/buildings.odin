@@ -26,7 +26,6 @@ BUILDING_TYPE :: enum {
 Building :: struct {
     rect: rl.Rectangle,
     type: BUILDING_TYPE,
-    name: string,
     texture: ^rl.Texture,
     update_function: proc()
 }
@@ -50,7 +49,11 @@ is_position_occupied :: proc(position: rl.Vector2) -> (^Building, bool) {
 
 buildings_init :: proc() {
     registered_building := [?]Building{
-        { rect = {0, 0, auto_cast gfx["mine"].width, auto_cast gfx["mine"].height}, type = .MINER, texture = &gfx["mine"]},
+        { rect = {0, 0, auto_cast gfx["drill"].width, auto_cast gfx["drill"].height}, type = .MINER, texture = &gfx["drill"]},
+        { rect = {0, 0, auto_cast gfx["cent_object"].width, auto_cast gfx["cent_object"].height}, type = .MINER, texture = &gfx["cent_object"]},
+        { rect = {0, 0, auto_cast gfx["factory_object"].width, auto_cast gfx["factory_object"].height}, type = .MINER, texture = &gfx["factory_object"]},
+        { rect = {0, 0, auto_cast gfx["reactor_block"].width, auto_cast gfx["reactor_block"].height}, type = .MINER, texture = &gfx["reactor_block"]},
+        { rect = {0, 0, auto_cast gfx["cooler_object"].width, auto_cast gfx["cooler_object"].height}, type = .MINER, texture = &gfx["cooler_object"]},
     }
 
     reserve(&standing_buildings, 1024)
