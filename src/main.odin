@@ -38,12 +38,14 @@ main :: proc() {
         mouse_screen_position.x = (mouse.x - (f32(rl.GetScreenWidth()) - (VIRTUAL_WIDTH * scale)) * 0.5) / scale
         mouse_screen_position.y = (mouse.y - (f32(rl.GetScreenHeight()) - (VIRTUAL_HEIGHT * scale)) * 0.5) / scale
         game_update()
-
+        ui_update()
+        
         rl.BeginTextureMode(render_target)
         rl.BeginMode2D(main_camera)
         rl.ClearBackground(rl.WHITE)
         game_render()
         rl.EndMode2D()
+        ui_render()
         rl.EndTextureMode()
 
         rl.BeginDrawing()
