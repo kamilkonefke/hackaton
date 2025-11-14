@@ -7,12 +7,13 @@ import "core:math"
 GAP: f32 = 10.0
 MARGIN: f32 = 20.0
 
-CLOCK_SIZE: f32 = 30.0
+CLOCK_SIZE: f32 = 20.0
 CLOCK_BORDER: f32 = 2.0
 CLOCK_SEGMENTS: i32 = 40
 CLOCK_LINE_THICKNESS: f32 = 2.0
-CLOCK_DISPLAY_WARNING: f32 = 10.0
+CLOCK_DISPLAY_WARNING: f32 = 90.0
 CLOCK_PADDING: f32 = 8.0
+CLOCK_GAP: f32 = 5.0
 
 ui_clock :: proc(pos: rl.Vector2, max: f32, val: f32, label: string) -> bool {
     // Background
@@ -59,16 +60,16 @@ ui_clock :: proc(pos: rl.Vector2, max: f32, val: f32, label: string) -> bool {
 
     rl.DrawTextEx(font, label_text, {
         center_point.x - label_measure.x / 2,
-        center_point.y - CLOCK_SIZE - GAP - f32(gfx["warning_sign"].height)
+        center_point.y - CLOCK_SIZE - CLOCK_GAP - f32(gfx["warning_sign"].height)
     }, 12, 0, {
-        255,255,255,150
+        255,255,255,180
     })
 
     // Warning
     if percent * 100 <= CLOCK_DISPLAY_WARNING {
         rl.DrawTextureV(gfx["warning_sign"], {
-            center_point.x - label_measure.x - GAP,
-            center_point.y - CLOCK_SIZE - GAP - f32(label_measure.x)
+            center_point.x - label_measure.x - CLOCK_GAP * 2,
+            center_point.y - CLOCK_SIZE - CLOCK_GAP * 2 - f32(label_measure.x)
         }, rl.WHITE)
 
         if percent == 0 {   
@@ -79,10 +80,14 @@ ui_clock :: proc(pos: rl.Vector2, max: f32, val: f32, label: string) -> bool {
     return false
 }
 
-TOGGLE_SIZE: f32 = 16.0
+TOGGLE_SIZE: f32 = 12.0
 TOGGLE_PADDING: f32 = 4.0
-BUILDINGS_CONTAINER_HEIGHT: f32 = 70
+
+BUILDINGS_CONTAINER_HEIGHT: f32 = 50.0
 BUILDINGS_CONTAINER_WIDTH: f32 = VIRTUAL_WIDTH * 0.7
+BUILDINGS_CONTAINER_PADDING: f32 = 8.0
+BUILDINGS_CONTAINER_GAP: f32 = GAP * 2 
+BUILDINGS_CONTAINER_TEXTURE_SCALE: f32 = 2.0
 
 toggle_button_pos_target: rl.Vector2 = {
     MARGIN,
@@ -112,8 +117,8 @@ ui_toggle_buildings_render :: proc() {
 
     // Button
     rl.DrawRectangleRounded(toggle_rect, 0.25, 10, COLOR_PURPLE)
-    rl.DrawTextureV(toggle_button_icon, { toggle_rect.x + TOGGLE_PADDING, toggle_rect.y + TOGGLE_PADDING }, rl.Color{
-        255,255,255, 150
+    rl.DrawTextureEx(toggle_button_icon, { toggle_rect.x + TOGGLE_PADDING, toggle_rect.y + TOGGLE_PADDING }, 0, 1, rl.Color{
+        255,255,255, 180
     })
 }
 
@@ -167,8 +172,18 @@ ui_buildings_container_render :: proc() {
 
     // Container Render
     rl.DrawRectangleRounded(container_rect, 0.25, 10, COLOR_PURPLE)
+    new_pos: rl.Vector2 = {
+        container_rect.x + BUILDINGS_CONTAINER_PADDING,
+        container_rect.y + BUILDINGS_CONTAINER_HEIGHT / 2 - SPRITE_SIZE * BUILDINGS_CONTAINER_TEXTURE_SCALE / 2
+    }
+
+    for building in avilable_buildings {
+        rl.DrawTextureEx(building.texture^, new_pos, 0, BUILDINGS_CONTAINER_TEXTURE_SCALE, rl.WHITE)
+
+        new_pos.x += SPRITE_SIZE * BUILDINGS_CONTAINER_TEXTURE_SCALE + BUILDINGS_CONTAINER_GAP
+    }
 }
 
 ui_buildings_container_update :: proc() {
-
+    
 }
