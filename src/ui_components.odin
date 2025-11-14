@@ -94,7 +94,7 @@ ui_toggle_buildings_render :: proc() {
     }
 
     rl.DrawRectangleRounded(toggle_rect, 0.25, 10, COLOR_PURPLE)
-    rl.DrawTextureV(toggle_button_icon, { toggle_rect.x + TOGGLE_PADDING, toggle_rect.y + TOGGLE_PADDING }, COLOR_INDIGO)
+    rl.DrawTextureV(toggle_button_icon, { toggle_rect.x + TOGGLE_PADDING, toggle_rect.y + TOGGLE_PADDING }, rl.WHITE)
 }
 
 ui_toggle_buildings_update :: proc() {
