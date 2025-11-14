@@ -1,5 +1,6 @@
 package main
 
+import "core:math/linalg"
 import rl "vendor:raylib"
 import "core:math"
 
@@ -61,15 +62,81 @@ ui_clock :: proc(pos: rl.Vector2, max: f32, val: f32, label: string) -> bool {
     return false
 }
 
-TOGGLE_SIZE: f32 = 16
+TOGGLE_SIZE: f32 = 16.0
+TOGGLE_PADDING: f32 = 4.0
+BUILDINGS_CONTAINER_HEIGHT: f32 = 70
+BUILDINGS_CONTAINER_WIDTH: f32 = VIRTUAL_WIDTH * 0.7
 
-ui_toggle_buildings :: proc() {
-    toggle_rect: rl.Rectangle = {
-        x = MARGIN,
-        y = VIRTUAL_HEIGHT - TOGGLE_SIZE - MARGIN,
-        width = TOGGLE_SIZE,
-        height = TOGGLE_SIZE,
+toggle_button_pos_target: rl.Vector2 = {
+    MARGIN,
+    VIRTUAL_HEIGHT - TOGGLE_SIZE - MARGIN - TOGGLE_PADDING,
+}
+toggle_button_pos := toggle_button_pos_target
+toggle_button_icon: rl.Texture
+
+toggle_rect: rl.Rectangle
+
+buildings_container_pos_target: rl.Vector2 = {
+    MARGIN,
+    VIRTUAL_HEIGHT
+}
+buildings_container_pos := buildings_container_pos_target
+
+is_building_toggled := false
+
+ui_toggle_buildings_render :: proc() {
+    toggle_button_pos = linalg.lerp(toggle_button_pos, toggle_button_pos_target, f32(rl.GetFrameTime() * 10))
+    toggle_rect = {
+        x = toggle_button_pos.x,
+        y = toggle_button_pos.y,
+        width = TOGGLE_SIZE + TOGGLE_PADDING * 2,
+        height = TOGGLE_SIZE + TOGGLE_PADDING * 2,
     }
 
-    rl.DrawRectangleRec(toggle_rect, COLOR_PURPLE)
+    rl.DrawRectangleRounded(toggle_rect, 0.25, 10, COLOR_PURPLE)
+    rl.DrawTextureV(toggle_button_icon, { toggle_rect.x + TOGGLE_PADDING, toggle_rect.y + TOGGLE_PADDING }, COLOR_INDIGO)
+}
+
+ui_toggle_buildings_update :: proc() {
+    if rl.CheckCollisionPointRec(mouse_screen_position, toggle_rect) && rl.IsMouseButtonPressed(.LEFT) {
+        is_building_toggled = !is_building_toggled
+
+        if is_building_toggled {
+            toggle_button_icon = gfx["chevron_down"]
+            toggle_button_pos_target = {
+                MARGIN,
+                VIRTUAL_HEIGHT - TOGGLE_SIZE - MARGIN - TOGGLE_PADDING - BUILDINGS_CONTAINER_HEIGHT - GAP, 
+            }
+            buildings_container_pos_target = {
+                MARGIN,
+                VIRTUAL_HEIGHT - BUILDINGS_CONTAINER_HEIGHT - MARGIN
+            }
+        } else {
+            toggle_button_icon = gfx["chevron_up"]
+            toggle_button_pos_target = {
+                MARGIN,
+                VIRTUAL_HEIGHT - TOGGLE_SIZE - MARGIN - TOGGLE_PADDING,
+            }
+            buildings_container_pos_target = {
+                MARGIN,
+                VIRTUAL_HEIGHT
+            }
+        }
+    }
+}
+
+ui_buildings_container_render :: proc() {
+    buildings_container_pos = linalg.lerp(buildings_container_pos, buildings_container_pos_target, f32(rl.GetFrameTime() * 10))
+    container_rect: rl.Rectangle = {
+        x = buildings_container_pos.x,
+        y = buildings_container_pos.y,
+        width = BUILDINGS_CONTAINER_WIDTH,
+        height = BUILDINGS_CONTAINER_HEIGHT,
+    }
+
+    rl.DrawRectangleRounded(container_rect, 0.25, 10, COLOR_PURPLE)
+}
+
+ui_buildings_container_update :: proc() {
+
 }

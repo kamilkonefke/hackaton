@@ -1,7 +1,7 @@
 package main
 
 game_init :: proc() {
-    
+    toggle_button_icon = gfx["chevron_up"]    
 }
 
 game_update :: proc() {
