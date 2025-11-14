@@ -9,6 +9,16 @@ player_speed: f32 = 175.0
 player_velocity: rl.Vector2 = {0, 0}
 player_direction: bool = true //true -> right ; false -> left
 
+player_check_collisions :: proc() -> bool{
+    for building in standing_buildings {
+        if rl.Vector2Distance(player_pos, {building.rect.x, building.rect.y}) <= 12 {
+            player_pos -= player_velocity * rl.GetFrameTime()
+            return true
+        }
+    }
+    return false
+}
+
 player_update :: proc() {
     initial_pos_h := player_rect.x
     input_dir: rl.Vector2 = {0, 0}
@@ -29,8 +39,10 @@ player_update :: proc() {
     player_velocity = rl.Vector2Normalize(input_dir) * player_speed
     player_pos += player_velocity * rl.GetFrameTime()
     player_velocity *= 0.99
-    player_rect.x = player_pos.x
-    player_rect.y = player_pos.y
+    if !player_check_collisions() {
+        player_rect.x = player_pos.x
+        player_rect.y = player_pos.y
+    }
 
     player_direction = player_rect.x - initial_pos_h >= 0
 }
