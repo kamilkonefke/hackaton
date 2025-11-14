@@ -14,6 +14,8 @@ tilemap : [TILEMAP_WIDTH*TILEMAP_HEIGHT]Tile
 TILEMAP_WIDTH :: 256
 TILEMAP_HEIGHT :: 256
 
+SPRITE_SIZE :: 16
+
 GROUND_TILES :: []Tile {
     Tile{"ground", 0.0},
     Tile{"ground", 90.0},
@@ -53,24 +55,24 @@ tilemap_render :: proc() {
     offset_x := player_rect.x + main_camera.offset.x
     offset_y := player_rect.y + main_camera.offset.y
 
-    startTileX := math.floor(main_camera.offset.x / 16) * 16
-    startTileY := math.floor(main_camera.offset.y / 16) * 16
+    startTileX := math.floor(main_camera.offset.x / SPRITE_SIZE) * SPRITE_SIZE
+    startTileY := math.floor(main_camera.offset.y / SPRITE_SIZE) * SPRITE_SIZE
 
-    numTilesX := int(VIRTUAL_WIDTH / 16) + 2
-    numTilesY := int(VIRTUAL_HEIGHT / 16) + 2
+    numTilesX := int(VIRTUAL_WIDTH / SPRITE_SIZE) + 2
+    numTilesY := int(VIRTUAL_HEIGHT / SPRITE_SIZE) + 2
 
     for y := int(startTileY); y < numTilesY; y+=1 {
         for x := int(startTileX); x < numTilesX; x+=1 {
             tile := tilemap_get_tile(x, y)
             tex, exists := gfx[tile.sprite]
 
-            xCoord: i32 = i32(x * 16)
-            yCoord: i32 = i32(y * 16)
+            xCoord: i32 = i32(x * SPRITE_SIZE)
+            yCoord: i32 = i32(y * SPRITE_SIZE)
             if exists {
                 rl.DrawTexturePro(
                     tex,
                     rl.Rectangle{0.0, 0.0, f32(tex.width), f32(tex.height)},
-                    rl.Rectangle{f32(xCoord), f32(yCoord), 16.0, 16.0},
+                    rl.Rectangle{f32(xCoord), f32(yCoord), SPRITE_SIZE, SPRITE_SIZE},
                     rl.Vector2{8.0, 8.0},
                     tile.rotation,
                     rl.WHITE
