@@ -20,5 +20,5 @@ ui_render :: proc() {
     ui_toggle_buildings_render()
     ui_buildings_container_render()
 
-    money_render()
+    energy_render()
 }
