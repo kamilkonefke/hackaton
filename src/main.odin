@@ -12,6 +12,13 @@ VIRTUAL_HEIGHT :: 360
 mouse_screen_position: rl.Vector2 = {0.0, 0.0}
 scale: f32 = 0.0
 
+main_camera: rl.Camera2D = rl.Camera2D{
+    target = {0.0, 0.0},
+    offset = {0.0, 0.0},
+    rotation = 0.0,
+    zoom = 1.0,
+}
+
 main :: proc() {
     rl.SetConfigFlags(rl.ConfigFlags{.VSYNC_HINT, .WINDOW_RESIZABLE})
     rl.InitWindow(1280, 720, "Hackaton")
@@ -34,8 +41,10 @@ main :: proc() {
         ui_update()
         
         rl.BeginTextureMode(render_target)
+        rl.BeginMode2D(main_camera)
         rl.ClearBackground(rl.WHITE)
         game_render()
+        rl.EndMode2D()
         ui_render()
         rl.EndTextureMode()
 
