@@ -15,7 +15,7 @@ TILEMAP_WIDTH :: 256
 TILEMAP_HEIGHT :: 256
 
 GROUND_TILES :: []Tile {
-    //Tile{"ground", 0.0},
+    Tile{"ground", 0.0},
     Tile{"ground", 90.0},
     Tile{"ground", 180.0},
     Tile{"ground", 270.0},
@@ -83,7 +83,7 @@ tilemap_render :: proc() {
 @private
 map_f32_to_tile :: proc(value: f32) -> Tile {
     val := (value + 1) / 2 // between 0 and 1
-    len := f32(len(GROUND_TILES)-1)
+    len := f32(len(GROUND_TILES))
 
     sprite_id := int(math.floor(val * len))
 
