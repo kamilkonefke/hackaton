@@ -29,14 +29,6 @@ ui_clock :: proc(pos: rl.Vector2, max: f32, val: f32, label: string) -> bool {
     // Progress
     percent := val/max
     
-    if percent <= 10 {
-        // Display warning
-
-        if percent == 0 {
-            return true   
-        }
-    }
-    
     angle := ((180 * percent) + 180)
 
     rl.DrawCircleSector({
@@ -58,6 +50,17 @@ ui_clock :: proc(pos: rl.Vector2, max: f32, val: f32, label: string) -> bool {
         pos.x - label_measure.x / 2,
         pos.y - CLOCK_SIZE - GAP - label_measure.y
     }, 12, 0, COLOR_PURPLE)
+
+    if percent <= 10 {
+        rl.DrawTextureV(gfx["warning_sign"], {
+            pos.x + label_measure.x / 2 + GAP,
+            pos.y - CLOCK_SIZE - GAP - f32(gfx["warning_sign"].height)
+        }, rl.WHITE)
+
+        if percent == 0 {
+            return true   
+        }
+    }
 
     return false
 }
@@ -94,7 +97,7 @@ ui_toggle_buildings_render :: proc() {
     }
 
     rl.DrawRectangleRounded(toggle_rect, 0.25, 10, COLOR_PURPLE)
-    rl.DrawTextureV(toggle_button_icon, { toggle_rect.x + TOGGLE_PADDING, toggle_rect.y + TOGGLE_PADDING }, rl.WHITE)
+    rl.DrawTextureV(toggle_button_icon, { toggle_rect.x + TOGGLE_PADDING, toggle_rect.y + TOGGLE_PADDING }, COLOR_PURPLE) // Purple color makes it darker.
 }
 
 ui_toggle_buildings_update :: proc() {
