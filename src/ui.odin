@@ -16,7 +16,7 @@ ui_update :: proc() {
 
 
 ui_render :: proc() {
-    ui_clock({VIRTUAL_WIDTH - CLOCK_SIZE - MARGIN, VIRTUAL_HEIGHT - MARGIN}, 100.0, 5.0, "5.0")
+    ui_clock({VIRTUAL_WIDTH - CLOCK_SIZE - MARGIN, VIRTUAL_HEIGHT - MARGIN}, 100.0, 60.0, "60.0")
     ui_toggle_buildings_render()
     ui_buildings_container_render()
 
