@@ -30,6 +30,7 @@ main :: proc() {
         mouse := rl.GetMousePosition()
         mouse_screen_position.x = (mouse.x - (f32(rl.GetScreenWidth()) - (VIRTUAL_WIDTH * scale)) * 0.5) / scale
         mouse_screen_position.y = (mouse.y - (f32(rl.GetScreenHeight()) - (VIRTUAL_HEIGHT * scale)) * 0.5) / scale
+        game_update()
 
         rl.BeginTextureMode(render_target)
         rl.ClearBackground(rl.WHITE)
