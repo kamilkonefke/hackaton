@@ -10,10 +10,13 @@ COLOR_TEAL: rl.Color = {109, 188, 185, 255}
 COLOR_AQUA: rl.Color = {140, 239, 182, 255}
 
 ui_update :: proc() {
-
+    ui_toggle_buildings_update()
+    ui_buildings_container_update()
 }
 
 
 ui_render :: proc() {
-    ui_clock({100, 100}, 100.0, 90.0, "Test Label")
+ //    ui_clock({100, 100}, 100.0, 90.0, "Test Label")
+    ui_toggle_buildings_render()
+    ui_buildings_container_render()
 }
