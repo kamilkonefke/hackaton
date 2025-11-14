@@ -15,17 +15,17 @@ CLOCK_DISPLAY_WARNING: f32 = 10.0
 
 ui_clock :: proc(pos: rl.Vector2, max: f32, val: f32, label: string) -> bool {
     // Border
-    rl.DrawCircleSector(pos, CLOCK_SIZE + CLOCK_BORDER, 180, 360, CLOCK_SEGMENTS, COLOR_PURPLE)
+    rl.DrawCircleSector(pos, CLOCK_SIZE + CLOCK_BORDER, 180, 360, CLOCK_SEGMENTS, rl.BLACK)
     rl.DrawLineEx({
         pos.x - CLOCK_SIZE - CLOCK_BORDER,
         pos.y + 1 // 1 because to start after "main clock"
     }, {
         pos.x + CLOCK_SIZE + CLOCK_BORDER,
         pos.y + 1
-    }, CLOCK_BORDER, COLOR_PURPLE)
+    }, CLOCK_BORDER, rl.BLACK)
     
     // Main circle fill
-    rl.DrawCircleSector(pos, CLOCK_SIZE, 180, 360, CLOCK_SEGMENTS, COLOR_INDIGO)
+    rl.DrawCircleSector(pos, CLOCK_SIZE, 180, 360, CLOCK_SEGMENTS, COLOR_PURPLE)
     
     // Progress
     percent := val/max
@@ -35,13 +35,13 @@ ui_clock :: proc(pos: rl.Vector2, max: f32, val: f32, label: string) -> bool {
     rl.DrawCircleSector({
         pos.x,
         pos.y
-    }, CLOCK_SIZE, 180, angle, 20, COLOR_BLUE)
+    }, CLOCK_SIZE, 180, angle, 20, COLOR_INDIGO)
     
     line_angle := angle * rl.DEG2RAD
     rl.DrawLineEx(pos, {
         pos.x + math.cos(line_angle) * CLOCK_SIZE,
         pos.y + math.sin(line_angle) * CLOCK_SIZE
-    }, CLOCK_LINE_THICKNESS, COLOR_PURPLE)
+    }, CLOCK_LINE_THICKNESS, rl.BLACK)
     
     // Label
     label_text := rl.TextFormat("%s", label)
@@ -100,7 +100,9 @@ ui_toggle_buildings_render :: proc() {
 
     // Button
     rl.DrawRectangleRounded(toggle_rect, 0.25, 10, COLOR_PURPLE)
-    rl.DrawTextureV(toggle_button_icon, { toggle_rect.x + TOGGLE_PADDING, toggle_rect.y + TOGGLE_PADDING }, COLOR_PURPLE) // Purple color makes it darker.
+    rl.DrawTextureV(toggle_button_icon, { toggle_rect.x + TOGGLE_PADDING, toggle_rect.y + TOGGLE_PADDING }, rl.Color{
+        255,255,255, 150
+    })
 }
 
 ui_toggle_buildings_update :: proc() {
