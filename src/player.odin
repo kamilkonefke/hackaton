@@ -52,11 +52,11 @@ player_update :: proc() {
 player_render :: proc() {
     rl.DrawTextureRec(gfx["skin"], {0, 0, player_rect.width, player_rect.height}, {player_rect.x, player_rect.y}, rl.WHITE)
 
-        if player_direction {
-            player_rect.width = math.abs(player_rect.width)
-        } else{
-            player_rect.width = -math.abs(player_rect.width)
-        }
+    if player_direction {
+        player_rect.width = math.abs(player_rect.width)
+    } else{
+        player_rect.width = -math.abs(player_rect.width)
+    }
 }
 
 adjust_camera_to_player :: proc() {

@@ -26,7 +26,6 @@ BUILDING_TYPE :: enum {
 Building :: struct {
     rect: rl.Rectangle,
     type: BUILDING_TYPE,
-    name: string,
     texture: ^rl.Texture,
     update_function: proc()
 }
@@ -50,12 +49,11 @@ is_position_occupied :: proc(position: rl.Vector2) -> (^Building, bool) {
 
 buildings_init :: proc() {
     registered_building := [?]Building{
-        { rect = {0, 0, auto_cast gfx["mine"].width, auto_cast gfx["mine"].height}, type = .MINER, texture = &gfx["mine"]},
+        { rect = {0, 0, auto_cast gfx["drill"].width, auto_cast gfx["drill"].height}, type = .MINER, texture = &gfx["drill"]},
         { rect = {0, 0, auto_cast gfx["cent_object"].width, auto_cast gfx["cent_object"].height}, type = .MINER, texture = &gfx["cent_object"]},
         { rect = {0, 0, auto_cast gfx["factory_object"].width, auto_cast gfx["factory_object"].height}, type = .MINER, texture = &gfx["factory_object"]},
-        { rect = {0, 0, auto_cast gfx["cooler_object"].width, auto_cast gfx["cooler_object"].height}, type = .POWER_POLE, texture = &gfx["cooler_object"]},
-        { rect = {0, 0, auto_cast gfx["fan"].width, auto_cast gfx["fan"].height}, type = .MINER, texture = &gfx["fan"]},
-        { rect = {0, 0, auto_cast gfx["mine"].width, auto_cast gfx["mine"].height}, type = .MINER, texture = &gfx["mine"]},
+        { rect = {0, 0, auto_cast gfx["reactor_block"].width, auto_cast gfx["reactor_block"].height}, type = .MINER, texture = &gfx["reactor_block"]},
+        { rect = {0, 0, auto_cast gfx["cooler_object"].width, auto_cast gfx["cooler_object"].height}, type = .MINER, texture = &gfx["cooler_object"]},
     }
 
     reserve(&standing_buildings, 1024)
@@ -98,9 +96,10 @@ place_transporters :: proc() {
 }
 
 buildings_update :: proc() {
+    cursor_position = rl.GetScreenToWorld2D(mouse_screen_position, main_camera)
     cursor_position = {
-        math.floor(mouse_screen_position.x / 16) * 16,
-        math.floor(mouse_screen_position.y / 16) * 16
+        (math.floor(cursor_position.x / SPRITE_SIZE) * SPRITE_SIZE),
+        (math.floor(cursor_position.y / SPRITE_SIZE) * SPRITE_SIZE)
     }
 
     if rl.IsKeyPressed(.ONE) {
@@ -117,11 +116,11 @@ buildings_update :: proc() {
                 return
             }
 
-            building_cpy: Building = selected_building^
-            building_cpy.rect.x = cursor_position.x
-            building_cpy.rect.y = cursor_position.y
+            building_copy: Building = selected_building^
+            building_copy.rect.x = cursor_position.x
+            building_copy.rect.y = cursor_position.y
 
-            append(&standing_buildings, building_cpy)
+            append(&standing_buildings, building_copy)
         }
     }
 
@@ -137,11 +136,7 @@ buildings_update :: proc() {
 buildings_render :: proc() {
     // Building
     if selected_building != nil {
-        snapped_pos: rl.Vector2 = {
-            math.floor(mouse_screen_position.x / 16) * 16,
-            math.floor(mouse_screen_position.y / 16) * 16
-        }
-        rl.DrawTextureV(selected_building.texture^, snapped_pos, {255.0, 255.0, 255.0, 150.0})
+        rl.DrawTextureV(selected_building.texture^, cursor_position, {255.0, 255.0, 255.0, 150.0})
     }
 
     for building in standing_buildings {
