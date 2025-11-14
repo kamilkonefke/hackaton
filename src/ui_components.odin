@@ -11,6 +11,7 @@ CLOCK_SIZE: f32 = 30.0
 CLOCK_BORDER: f32 = 2.0
 CLOCK_SEGMENTS: i32 = 40
 CLOCK_LINE_THICKNESS: f32 = 2.0
+CLOCK_DISPLAY_WARNING: f32 = 10.0
 
 ui_clock :: proc(pos: rl.Vector2, max: f32, val: f32, label: string) -> bool {
     // Border
@@ -51,7 +52,8 @@ ui_clock :: proc(pos: rl.Vector2, max: f32, val: f32, label: string) -> bool {
         pos.y - CLOCK_SIZE - GAP - label_measure.y
     }, 12, 0, COLOR_PURPLE)
 
-    if percent <= 10 {
+    // Warning
+    if percent <= CLOCK_DISPLAY_WARNING {
         rl.DrawTextureV(gfx["warning_sign"], {
             pos.x - f32(gfx["warning_sign"].width) / 2,
             pos.y - CLOCK_SIZE - GAP * 2 - label_measure.y - f32(gfx["warning_sign"].height)
@@ -96,6 +98,7 @@ ui_toggle_buildings_render :: proc() {
         height = TOGGLE_SIZE + TOGGLE_PADDING * 2,
     }
 
+    // Button
     rl.DrawRectangleRounded(toggle_rect, 0.25, 10, COLOR_PURPLE)
     rl.DrawTextureV(toggle_button_icon, { toggle_rect.x + TOGGLE_PADDING, toggle_rect.y + TOGGLE_PADDING }, COLOR_PURPLE) // Purple color makes it darker.
 }
@@ -104,6 +107,7 @@ ui_toggle_buildings_update :: proc() {
     if rl.CheckCollisionPointRec(mouse_screen_position, toggle_rect) && rl.IsMouseButtonPressed(.LEFT) {
         is_building_toggled = !is_building_toggled
 
+        // Container UP
         if is_building_toggled {
             toggle_button_icon = gfx["chevron_down"]
             toggle_button_pos_target = {
@@ -114,6 +118,7 @@ ui_toggle_buildings_update :: proc() {
                 MARGIN,
                 VIRTUAL_HEIGHT - BUILDINGS_CONTAINER_HEIGHT - MARGIN
             }
+        // Container DOWN
         } else {
             toggle_button_icon = gfx["chevron_up"]
             toggle_button_pos_target = {
@@ -137,6 +142,7 @@ ui_buildings_container_render :: proc() {
         height = BUILDINGS_CONTAINER_HEIGHT,
     }
 
+    // Container Render
     rl.DrawRectangleRounded(container_rect, 0.25, 10, COLOR_PURPLE)
 }
 
