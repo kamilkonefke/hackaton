@@ -265,33 +265,46 @@ ui_buildings_container_update :: proc() {
 
 BINDS_PADDING: f32 = 8.0
 
-hide_binds := true
+hide_binds := false
+
+binds_pos_target: rl.Vector2 = { VIRTUAL_WIDTH, MARGIN }
+binds_pos := binds_pos_target
 
 ui_draw_binds :: proc() {
     if rl.IsKeyPressed(.O) {
         hide_binds = !hide_binds
     }
 
-    if (!hide_binds) do return
-
     bind_text := rl.TextFormat("WASD - chodzenie\nTAB - otwieranie menu budowania\nSCROLL - usuwanie polaczenie\nLPM - stawianie budynkow\nRPM - laczenie\nQ - usuwanie obiektow\nlub anulowanie w trybie budowania\nO - chowanie tego menu")
     text_measure := rl.MeasureTextEx(font, bind_text, 12, 0)
 
+    panel_width := text_measure.x + BINDS_PADDING * 2
+
+    if !hide_binds {
+        binds_pos_target = { VIRTUAL_WIDTH - panel_width - MARGIN, MARGIN }
+    } else {
+        binds_pos_target = { VIRTUAL_WIDTH, MARGIN }
+    }
+
+    binds_pos = linalg.lerp(binds_pos, binds_pos_target, f32(rl.GetFrameTime() * 10))
+
     bind_rect: rl.Rectangle = {
-        x = VIRTUAL_WIDTH - text_measure.x - MARGIN * 2,
-        y = MARGIN,
-        width = text_measure.x + BINDS_PADDING * 2,
+        x = binds_pos.x,
+        y = binds_pos.y,
+        width = panel_width,
         height = text_measure.y + BINDS_PADDING * 2,
     }
 
-    rl.DrawRectangleRounded(bind_rect, 0.05, 10, COLOR_PURPLE)
+    if bind_rect.x < VIRTUAL_WIDTH {
+        rl.DrawRectangleRounded(bind_rect, 0.05, 10, COLOR_PURPLE)
 
-    rl.DrawTextEx(font, bind_text, {
-        bind_rect.x + BINDS_PADDING,
-        bind_rect.y + BINDS_PADDING
-    }, 12, 0, {
-        255,255,255, 180
-    })
+        rl.DrawTextEx(font, bind_text, {
+            bind_rect.x + BINDS_PADDING,
+            bind_rect.y + BINDS_PADDING
+        }, 12, 0, {
+            255,255,255, 180
+        })
+    }
 }
 
 ui_draw_dialog :: proc(text: string) -> (bool) {
