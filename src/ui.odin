@@ -16,6 +16,12 @@ ui_update :: proc() {
         splash_screen_update()
         return
     }
+
+    if current_game_state == .PauseMenu {
+        pause_menu_update()
+        return
+    }
+
     ui_toggle_buildings_update()
     ui_buildings_container_update()
 }
@@ -27,6 +33,12 @@ ui_render :: proc() {
         splash_screen_render()
         return
     }
+    
+    if current_game_state == .PauseMenu {
+        pause_menu_render()
+        return
+    }
+
     ui_clock({VIRTUAL_WIDTH - CLOCK_SIZE - MARGIN, VIRTUAL_HEIGHT - MARGIN}, 100.0, 60.0, "60.0")
     ui_toggle_buildings_render()
     ui_buildings_container_render()
