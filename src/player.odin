@@ -81,7 +81,8 @@ player_init :: proc() {
         append(&pos_array, i)
     }
     player_pos = {rand.choice(pos_array[:]) * SPRITE_SIZE, rand.choice(pos_array[:]) * SPRITE_SIZE}
-    for tilemap_get_tile(int(player_pos.x / SPRITE_SIZE), int(player_pos.y / SPRITE_SIZE)).sprite == "water" {
+    for tilemap_get_tile(int(player_pos.x / SPRITE_SIZE), int(player_pos.y / SPRITE_SIZE)).sprite == "water" ||
+        tilemap_get_tile(int(player_pos.x / SPRITE_SIZE), int(player_pos.y / SPRITE_SIZE)).sprite == "radioactive_sign" {
         player_pos = {rand.choice(pos_array[:]) * SPRITE_SIZE, rand.choice(pos_array[:]) * SPRITE_SIZE}
     }
 }
