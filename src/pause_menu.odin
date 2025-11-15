@@ -66,7 +66,7 @@ pause_menu_render :: proc() {
 
     base_pos.y += MENU_GAP / 2 + 10
 
-    play_text := rl.TextFormat("PLAY")
+    play_text := rl.TextFormat("GRAJ")
     play_measure = rl.MeasureTextEx(font, play_text, 48, 0)
     play_pos = {
         base_pos.x - play_measure.x / 2,
