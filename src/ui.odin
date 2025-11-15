@@ -24,6 +24,11 @@ ui_update :: proc() {
         return
     }
 
+    if current_game_state == .WinScreen {
+        win_screen_update()
+        return
+    }
+
     ui_toggle_buildings_update()
     ui_buildings_container_update()
 }
@@ -36,6 +41,11 @@ ui_render :: proc() {
     
     if current_game_state == .PauseMenu {
         pause_menu_render()
+        return
+    }
+
+    if current_game_state == .WinScreen {
+        win_screen_render()
         return
     }
 
