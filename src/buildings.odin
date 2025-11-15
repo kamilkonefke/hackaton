@@ -151,12 +151,12 @@ building_init_production :: proc(building: ^Building) {
 
 buildings_init :: proc() {
     registered_building := [?]Building{
-        { rect = {0, 0, SPRITE_SIZE, SPRITE_SIZE}, type = .MINER, texture = &gfx["drill"]},
-        { rect = {0, 0, SPRITE_SIZE, SPRITE_SIZE}, type = .CENT, texture = &gfx["cent_object"]},
-        { rect = {0, 0, SPRITE_SIZE, SPRITE_SIZE}, type = .FACTORY, texture = &gfx["factory_object"]},
-        { rect = {0, 0, SPRITE_SIZE, SPRITE_SIZE}, type = .WATER_PUMP, texture = &gfx["waterpump_object"]},
-        { rect = {0, 0, SPRITE_SIZE, SPRITE_SIZE}, type = .REACTOR, texture = &gfx["radioactive_sign"]},
-        { rect = {0, 0, SPRITE_SIZE, SPRITE_SIZE}, type = .COOLER, texture = &gfx["cooler_object"]},
+        { rect = {0, 0, SPRITE_SIZE, SPRITE_SIZE}, type = .MINER, texture = &gfx["drill"], cost = 100.0},
+        { rect = {0, 0, SPRITE_SIZE, SPRITE_SIZE}, type = .CENT, texture = &gfx["cent_object"], cost = 100.0},
+        { rect = {0, 0, SPRITE_SIZE, SPRITE_SIZE}, type = .FACTORY, texture = &gfx["factory_object"], cost = 100.0},
+        { rect = {0, 0, SPRITE_SIZE, SPRITE_SIZE}, type = .WATER_PUMP, texture = &gfx["waterpump_object"], cost = 100.0},
+        { rect = {0, 0, SPRITE_SIZE, SPRITE_SIZE}, type = .REACTOR, texture = &gfx["radioactive_sign"], cost = 100.0},
+        { rect = {0, 0, SPRITE_SIZE, SPRITE_SIZE}, type = .COOLER, texture = &gfx["cooler_object"], cost = 100.0},
     }
 
     reserve(&standing_buildings, 1024)
@@ -259,6 +259,10 @@ place_buildings :: proc() {
                 return
             }
 
+            if balance < selected_building.cost {
+                return
+            }
+
             if selected_building.type == .MINER && tile.sprite != "ore" {
                 return
             }
@@ -276,6 +280,7 @@ place_buildings :: proc() {
             building_copy.rect.y = cursor_position.y
             append(&standing_buildings, building_copy)
             
+            balance -= selected_building.cost
             building_init_production(&standing_buildings[len(standing_buildings)-1])
         }
     }
@@ -323,6 +328,14 @@ building_update_production :: proc(building: ^Building) {
         if building.production_timer >= building.production_time {
             building.is_producing = false
             building.production_timer = 0
+            if building.type == .COOLER {
+                balance += 100.0
+            } else if building.type == .REACTOR {
+                target_temperature += 25.0
+                target_watte += 5.0
+            } else if building.type == .WATER_PUMP {
+                target_temperature -= 5.0
+            }
             
             if config.output_type != .NONE {
                 building.output_buffer[config.output_type] += config.output_amount
