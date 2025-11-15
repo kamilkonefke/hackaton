@@ -1,6 +1,5 @@
 package main
 
-import "core:fmt"
 import "core:math"
 import rl "vendor:raylib"
 
@@ -24,7 +23,6 @@ ENERGY_GAP: f32 = 5.0
 BALANCE_WIN_CONDITION: f32 = 3000.0
 
 energy_update :: proc() {
-    fmt.println(balance, BALANCE_WIN_CONDITION, balance >= BALANCE_WIN_CONDITION)
     if balance >= BALANCE_WIN_CONDITION {
         current_game_state = .WinScreen
         return
