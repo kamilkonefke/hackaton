@@ -21,11 +21,13 @@ min_wattage: f32 = 0.0
 ENERGY_PADDING: f32 = 8.0
 ENERGY_GAP: f32 = 5.0
 
+BALANCE_WIN_CONDITION: f32 = 3000.0
+
 energy_update :: proc() {
-    // Check for game over condition
-    //if temperature >= game_over_temperature_threshold {
-    //    current_game_state = .GameOver
-    //}
+    if balance >= BALANCE_WIN_CONDITION {
+        //current_game_state = .Win
+        //return
+    }
 }
 
 energy_render :: proc() {
