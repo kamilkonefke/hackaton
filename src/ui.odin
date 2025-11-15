@@ -24,7 +24,11 @@ ui_update :: proc() {
         return
     }
 
-    energy_update()
+    if current_game_state == .WinScreen {
+        win_screen_update()
+        return
+    }
+
     ui_toggle_buildings_update()
     ui_buildings_container_update()
 }

@@ -107,5 +107,6 @@ GameState :: enum {
     PauseMenu,
     Freeze,
     GameOver,
-    Game
+    Game,
+    WinScreen
 }
