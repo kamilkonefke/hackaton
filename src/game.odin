@@ -1,6 +1,5 @@
 package main
 
-import "core:time"
 import rl "vendor:raylib"
 
 timer: f32 = 10 * 60 // 10min

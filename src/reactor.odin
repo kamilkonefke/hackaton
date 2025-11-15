@@ -1,9 +1,7 @@
 package main
 
 import rl "vendor:raylib"
-import "core:math"
 import "core:math/rand"
-import "core:fmt"
 
 reactor_pos: rl.Vector2 = {0, 0}
 reactor_show_arrow: bool = true

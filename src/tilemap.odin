@@ -3,7 +3,6 @@ package main
 import rl "vendor:raylib"
 import noise "core:math/noise"
 import "core:math"
-import "core:fmt"
 
 Tile :: struct {
     sprite: string,

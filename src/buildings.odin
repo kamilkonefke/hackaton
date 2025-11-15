@@ -1,7 +1,5 @@
 package main
 
-import "core:mem"
-import "core:fmt"
 import "core:math"
 import rl "vendor:raylib"
 
