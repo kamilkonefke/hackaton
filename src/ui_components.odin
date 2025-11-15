@@ -1,6 +1,5 @@
 package main
 
-import "core:fmt"
 import "core:math/linalg"
 import rl "vendor:raylib"
 import "core:math"
@@ -187,6 +186,25 @@ buildings_in_container: [dynamic]building_in_container = {}
 
 hovered_building := -1
 
+ui_get_building_name :: proc(building_type: BUILDING_TYPE) -> string {
+    switch type := building_type; type {
+        case .MINER:
+            return "Maszyna gornicza"
+        case .FACTORY:
+            return "Fabryka pretow"
+        case .WATER_PUMP: 
+            return "Pompa wodna"
+        case .CENT:
+            return "Wirowka"
+        case .COOLER:
+            return "Chlodzenia"
+        case .REACTOR: 
+            return "Reaktor"
+    }
+
+    return ""
+}
+
 ui_buildings_container_render :: proc() {
     buildings_container_pos = linalg.lerp(buildings_container_pos, buildings_container_pos_target, f32(rl.GetFrameTime() * 10))
     container_rect: rl.Rectangle = {
@@ -199,8 +217,15 @@ ui_buildings_container_render :: proc() {
     // Container Render
     rl.DrawRectangleRounded(container_rect, 0.25, 10, COLOR_PURPLE)
 
-    for element in buildings_in_container {
+    for element, index in buildings_in_container {
         rl.DrawTextureEx(element.building.texture^, element.pos, 0, BUILDINGS_CONTAINER_TEXTURE_SCALE, rl.WHITE)
+        if hovered_building == index {
+            label_name := rl.TextFormat("%v", ui_get_building_name(element.building.type))
+            rl.DrawTextEx(font, label_name, {
+                element.pos.x,
+                element.pos.y + BUILDINGS_CONTAINER_HEIGHT - MARGIN + GAP
+            }, 12, 0, rl.WHITE)
+        }
     }
 }
 
