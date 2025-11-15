@@ -24,6 +24,7 @@ player_check_collisions :: proc() -> bool{
     }
     // Check if on water
     if tilemap_get_tile(int(player_pos.x / SPRITE_SIZE), int(player_pos.y / SPRITE_SIZE)).sprite == "water" {
+        player_pos -= player_velocity * rl.GetFrameTime()
         return true
     }
     // Check building collision
