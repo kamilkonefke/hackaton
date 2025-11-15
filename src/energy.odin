@@ -4,7 +4,7 @@ import "core:math"
 import rl "vendor:raylib"
 import "core:fmt"
 
-balance: f32 = 1000.0
+balance: f32 = 500.0
 
 wattage: f32 = 0.0
 target_watte: f32 = 50.0
@@ -25,8 +25,8 @@ BALANCE_WIN_CONDITION: f32 = 3000.0
 
 energy_update :: proc() {
     if balance >= BALANCE_WIN_CONDITION {
-        //current_game_state = .Win
-        //return
+        current_game_state = .WinScreen
+        return
     }
 }
 

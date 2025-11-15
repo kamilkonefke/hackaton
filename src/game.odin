@@ -22,6 +22,12 @@ game_init :: proc() {
 
 game_update :: proc() {
     timer -= rl.GetFrameTime()
+
+    if timer <= 0 {
+        current_game_state = .GameOver
+        return
+    }
+
     buildings_update()
     player_update()
 }

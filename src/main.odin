@@ -28,7 +28,9 @@ is_on_hover: bool = false
 main :: proc() {
     rl.SetConfigFlags(rl.ConfigFlags{.VSYNC_HINT, .WINDOW_RESIZABLE})
     rl.InitWindow(1280, 720, "Hackaton")
+    rl.InitAudioDevice(); 
     defer rl.CloseWindow()
+    defer rl.CloseAudioDevice()
 
     rl.SetExitKey(.KEY_NULL)
 
@@ -97,8 +99,9 @@ main :: proc() {
 }
 
 play_music :: proc() {
-    if !rl.IsSoundPlaying() {
+    if !rl.IsSoundPlaying(sfx["music"]) {
         rl.PlaySound(sfx["music"])
+        rl.SetSoundVolume(sfx["music"], 0.5)
     }
 }
 

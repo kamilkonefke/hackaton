@@ -3,7 +3,6 @@ package main
 import "core:math/linalg"
 import rl "vendor:raylib"
 import "core:math"
-import "core:fmt"
 
 GAP: f32 = 10.0
 MARGIN: f32 = 20.0
