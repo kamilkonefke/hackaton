@@ -2,8 +2,9 @@ package main
 
 import "core:math"
 import rl "vendor:raylib"
+import "core:fmt"
 
-balance: f32 = -1000.0
+balance: f32 = 1000.0
 
 wattage: f32 = 0.0
 target_watte: f32 = 50.0
@@ -11,12 +12,30 @@ target_watte: f32 = 50.0
 temperature: f32 = 0.0
 target_temperature: f32 = 0.0
 
+max_temperature: f32 = 100.0
+min_temperature: f32 = 0.0
+
+max_wattage: f32 = 100.0
+min_wattage: f32 = 0.0
+
 ENERGY_PADDING: f32 = 8.0
 ENERGY_GAP: f32 = 5.0
 
+energy_update :: proc() {
+    // Check for game over condition
+    //if temperature >= game_over_temperature_threshold {
+    //    current_game_state = .GameOver
+    //}
+}
+
 energy_render :: proc() {
+    target_temperature = math.max(target_temperature, 0.0)
+    target_watte = math.max(target_watte, 0.0)
+    target_watte = math.lerp(target_watte, 0, 0.03 * rl.GetFrameTime())
+
     wattage = math.lerp(wattage, target_watte, rl.GetFrameTime() / 2.0)
-    temperature = math.lerp(temperature, target_temperature, rl.GetFrameTime() / 2.0)
+    temp := math.lerp(temperature, target_temperature, rl.GetFrameTime() / 2.0)
+    temperature = math.clamp(temp, min_temperature, max_temperature)
 
     balance_text := rl.TextFormat("%v", math.floor(balance))
     balance_measure := rl.MeasureTextEx(font, balance_text, 12, 0)

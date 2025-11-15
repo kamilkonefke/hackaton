@@ -24,6 +24,7 @@ ui_update :: proc() {
         return
     }
 
+    energy_update()
     ui_toggle_buildings_update()
     ui_buildings_container_update()
 }
@@ -39,8 +40,18 @@ ui_render :: proc() {
         return
     }
 
-    _, wattage_width := ui_clock({VIRTUAL_WIDTH - CLOCK_SIZE - MARGIN, VIRTUAL_HEIGHT - MARGIN}, 100.0, wattage, fmt.tprintf("%0.1f kW", wattage), 40)
-    ui_clock({VIRTUAL_WIDTH - CLOCK_SIZE - MARGIN - wattage_width - GAP, VIRTUAL_HEIGHT - MARGIN}, 100.0, temperature, fmt.tprintf("%0.1f C", temperature), 30)
+    _, wattage_width := ui_clock({VIRTUAL_WIDTH - CLOCK_SIZE - MARGIN, VIRTUAL_HEIGHT - MARGIN}, 100.0, wattage, fmt.tprintf("%0.1f kW", wattage), max_temperature * 0.75)
+    fatal_temp, _ := ui_clock({VIRTUAL_WIDTH - CLOCK_SIZE - MARGIN - wattage_width - GAP, VIRTUAL_HEIGHT - MARGIN}, 100.0, temperature, fmt.tprintf("%0.1f C", temperature), max_wattage * 0.75)
+    if fatal_temp {
+        current_game_state = .GameOver
+        return
+    }
+
+    if wattage >= max_wattage * 0.95 {
+        current_game_state = .GameOver
+        return
+    }
+
     ui_toggle_buildings_render()
     ui_buildings_container_render()
 
