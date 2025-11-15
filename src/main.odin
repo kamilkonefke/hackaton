@@ -9,6 +9,8 @@ WINDOW_HEIGHT :: 720
 VIRTUAL_WIDTH :: 640
 VIRTUAL_HEIGHT :: 360
 
+current_game_state: GameState = .SplashScreen
+
 mouse_screen_position: rl.Vector2 = {0.0, 0.0}
 scale: f32 = 0.0
 
@@ -35,21 +37,32 @@ main :: proc() {
     assets_load()
     defer assets_free()
     game_init()
+    splash_screen_init()
 
     for !rl.WindowShouldClose() {
         scale = math.min(f32(rl.GetScreenWidth() / VIRTUAL_WIDTH), f32(rl.GetScreenHeight() / VIRTUAL_HEIGHT))
         mouse := rl.GetMousePosition()
         mouse_screen_position.x = (mouse.x - (f32(rl.GetScreenWidth()) - (VIRTUAL_WIDTH * scale)) * 0.5) / scale
         mouse_screen_position.y = (mouse.y - (f32(rl.GetScreenHeight()) - (VIRTUAL_HEIGHT * scale)) * 0.5) / scale
-        game_update()
-        ui_update()
+        if current_game_state == .SplashScreen {
+            splash_screen_update()
+        } else {
+            game_update()
+            ui_update()
+        }
         
         rl.BeginTextureMode(render_target)
         rl.BeginMode2D(main_camera)
         rl.ClearBackground(COLOR_PURPLE)
-        game_render()
+        if current_game_state == .Game {
+            game_render()
+        }
         rl.EndMode2D()
-        ui_render()
+        if current_game_state == .SplashScreen {
+            splash_screen_render()
+        } else {
+            ui_render()
+        }
         rl.EndTextureMode()
 
         rl.BeginDrawing()
@@ -65,4 +78,9 @@ main :: proc() {
         draw_cursor()
         rl.EndDrawing()
     }
+}
+
+GameState :: enum {
+    SplashScreen,
+    Game
 }
