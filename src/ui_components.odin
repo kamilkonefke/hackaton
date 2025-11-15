@@ -11,13 +11,12 @@ CLOCK_SIZE: f32 = 20.0
 CLOCK_BORDER: f32 = 2.0
 CLOCK_SEGMENTS: i32 = 40
 CLOCK_LINE_THICKNESS: f32 = 2.0
-CLOCK_DISPLAY_WARNING: f32 = 90.0
 CLOCK_PADDING: f32 = 8.0
 CLOCK_GAP: f32 = 5.0
 
 used_clock: string
 
-ui_clock :: proc(pos: rl.Vector2, max: f32, val: f32, label: string) -> bool {
+ui_clock :: proc(pos: rl.Vector2, max: f32, val: f32, label: string, fatal: f32) -> (bool, f32) {
     // Background
     background_rec: rl.Rectangle = {
         x = pos.x - CLOCK_SIZE - CLOCK_BORDER - CLOCK_PADDING,
@@ -68,14 +67,14 @@ ui_clock :: proc(pos: rl.Vector2, max: f32, val: f32, label: string) -> bool {
     })
 
     // Warning
-    if percent * 100 <= CLOCK_DISPLAY_WARNING {
+    if percent * 100 <= fatal {
         rl.DrawTextureV(gfx["warning_sign"], {
-            center_point.x - label_measure.x - CLOCK_GAP * 2,
-            center_point.y - CLOCK_SIZE - CLOCK_GAP * 2 - f32(label_measure.x)
+            center_point.x - CLOCK_SIZE - CLOCK_GAP * 2 - SPRITE_SIZE / 2,
+            center_point.y - CLOCK_SIZE - CLOCK_GAP * 4 - SPRITE_SIZE
         }, rl.WHITE)
 
         if percent == 0 {   
-            return true   
+            return true, background_rec.width   
         }
     }
 
@@ -87,14 +86,14 @@ ui_clock :: proc(pos: rl.Vector2, max: f32, val: f32, label: string) -> bool {
         used_clock = ""
     }
 
-    return false
+    return false, background_rec.width
 }
 
 TOGGLE_SIZE: f32 = 12.0
 TOGGLE_PADDING: f32 = 4.0
 
 BUILDINGS_CONTAINER_HEIGHT: f32 = 50.0
-BUILDINGS_CONTAINER_WIDTH: f32 = VIRTUAL_WIDTH * 0.7
+BUILDINGS_CONTAINER_WIDTH: f32
 BUILDINGS_CONTAINER_PADDING: f32 = 8.0
 BUILDINGS_CONTAINER_GAP: f32 = GAP * 2 
 BUILDINGS_CONTAINER_TEXTURE_SCALE: f32 = 2.0

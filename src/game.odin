@@ -8,12 +8,14 @@ game_init :: proc() {
     tilemap_generate(42)
     buildings_init()
     toggle_button_icon = gfx["chevron_up"]    
+    BUILDINGS_CONTAINER_WIDTH = BUILDINGS_CONTAINER_PADDING
 
     for building in avilable_buildings {
         append(&buildings_in_container, building_in_container{
             pos = {0,0},
             building = building,
         })
+        BUILDINGS_CONTAINER_WIDTH += BUILDINGS_CONTAINER_TEXTURE_SCALE * SPRITE_SIZE + BUILDINGS_CONTAINER_GAP
     }
     player_init()
 }

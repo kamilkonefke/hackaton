@@ -5,6 +5,7 @@ import rl "vendor:raylib"
 
 balance: f32 = -1000.0
 wattage: f32 = 0.0
+temperature: f32 = 0.0
 target_watte: f32 = 50.0
 
 ENERGY_PADDING: f32 = 8.0

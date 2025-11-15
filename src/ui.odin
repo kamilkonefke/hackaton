@@ -39,7 +39,8 @@ ui_render :: proc() {
         return
     }
 
-    ui_clock({VIRTUAL_WIDTH - CLOCK_SIZE - MARGIN, VIRTUAL_HEIGHT - MARGIN}, 100.0, wattage, fmt.tprintf("%0.1f kW", wattage))
+    _, wattage_width := ui_clock({VIRTUAL_WIDTH - CLOCK_SIZE - MARGIN, VIRTUAL_HEIGHT - MARGIN}, 100.0, wattage, fmt.tprintf("%0.1f kW", wattage), 40)
+    ui_clock({VIRTUAL_WIDTH - CLOCK_SIZE - MARGIN - wattage_width - GAP, VIRTUAL_HEIGHT - MARGIN}, 100.0, temperature, fmt.tprintf("%0.1f C", temperature), 30)
     ui_toggle_buildings_render()
     ui_buildings_container_render()
 
