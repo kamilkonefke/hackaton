@@ -1,5 +1,6 @@
 package main
 
+import "core:mem"
 import "core:fmt"
 import "core:math"
 import rl "vendor:raylib"
@@ -62,7 +63,7 @@ get_production_config :: proc(building_type: BUILDING_TYPE) -> Production_Config
     case .REACTOR:
         return { input_type = .FUEL_ROD, input_amount = 1, output_type = .STEAM, output_amount = 1, time = 8.0}
     case .COOLER:
-        return { input_type = .STEAM, input_amount = 1, output_type = .ENERGY, output_amount = 3, time = 2.0}
+        return { input_type = .STEAM, input_amount = 1, output_type = .NONE, output_amount = 0, time = 1.0}
     }
     return { input_type = .NONE, input_amount = 0, output_type = .NONE, output_amount = 0, time = 0}
 }
@@ -143,7 +144,7 @@ last_transporter_anchor: ^Building
 building_init_production :: proc(building: ^Building) {
     config := get_production_config(building.type)
     building.production_time = config.time
-    building.buffer_capacity = 5
+    building.buffer_capacity = 2
     building.production_timer = 0
     building.is_producing = false
 }
@@ -166,6 +167,8 @@ buildings_init :: proc() {
 
 @(private="file")
 place_transporters :: proc() {
+
+    // Add transporter
     if rl.IsMouseButtonPressed(.RIGHT) {
         building, is_occupied := is_position_occupied(cursor_position)
 
@@ -189,9 +192,38 @@ place_transporters :: proc() {
             append(&standing_transporters, transporter)
             
             transporter_init(&standing_transporters[len(standing_transporters)-1])
-            
+
             last_transporter_anchor = nil
 
+            return
+        }
+        else if is_occupied && building != nil {
+            last_transporter_anchor = building
+        }
+    }
+
+    // Remove transporter
+    if rl.IsMouseButtonPressed(.MIDDLE) {
+        building, is_occupied := is_position_occupied(cursor_position)
+
+        if is_occupied == false {
+            return
+        }
+
+        if last_transporter_anchor != nil && building != last_transporter_anchor {
+            transporter: Transporter = {
+                previous = last_transporter_anchor,
+                next = building,
+            }
+
+            for t, i in standing_transporters {
+                if (t.previous == transporter.previous && t.next == transporter.next) || 
+                    (t.previous == transporter.next && t.next == transporter.previous) {
+                        last_transporter_anchor = nil
+                        unordered_remove(&standing_transporters, i)
+                        return
+                }
+            }
             return
         }
         else if is_occupied && building != nil {
@@ -205,6 +237,18 @@ place_buildings :: proc() {
     if selected_building != nil && using_ui == false {
         if rl.IsKeyPressed(.Q) {
             selected_building = nil
+
+            // Remove buildings
+            building, is_occupied := is_position_occupied(cursor_position)
+            if is_occupied {
+                fmt.printf("ae")
+                for b, i in standing_buildings {
+                    if b.rect.x == building.rect.x && b.rect.y == building.rect.y {
+                        ordered_remove(&standing_buildings, i)
+                        break
+                    }
+                }
+            }
         }
 
         if rl.IsMouseButtonPressed(.LEFT) {
@@ -222,6 +266,10 @@ place_buildings :: proc() {
                 return
             }
 
+            if selected_building.type != .WATER_PUMP && tile.sprite == "water" {
+                return
+            }
+
             building_copy: Building = selected_building^
             building_copy.rect.x = cursor_position.x
             building_copy.rect.y = cursor_position.y
@@ -235,19 +283,25 @@ place_buildings :: proc() {
 
 building_update_production :: proc(building: ^Building) {
     config := get_production_config(building.type)
+
+    if building.type == .COOLER {
+        if building.is_producing {
+            balance += 1 * rl.GetFrameTime()
+        }
+    }
     
     if building.type == .REACTOR {
         has_fuel := building.input_buffer[.FUEL_ROD] >= 1.0
         has_water := building.input_buffer[.WATER] >= 1.0
         
-        if !building.is_producing && has_fuel && has_water {
+        if building.is_producing == false && has_fuel && has_water {
             building.is_producing = true
             building.production_timer = 0
             building.input_buffer[.FUEL_ROD] -= 1.0
             building.input_buffer[.WATER] -= 1.0
         }
     } else {
-        if !building.is_producing {
+        if building.is_producing == false {
             can_produce := true
             
             if config.input_type != .NONE {
@@ -304,28 +358,23 @@ buildings_update :: proc() {
 
 @(private="file")
 is_connection_valid :: proc(transporter: Transporter) -> bool {
-    if transporter.previous.type == .MINER && transporter.next.type == .CENT ||
-        transporter.previous.type == .CENT && transporter.next.type == .MINER {
+    if transporter.previous.type == .MINER && transporter.next.type == .CENT {
         return true
     }
 
-    if transporter.previous.type == .CENT && transporter.next.type == .FACTORY || 
-        transporter.previous.type == .FACTORY && transporter.next.type == .CENT {
+    if transporter.previous.type == .CENT && transporter.next.type == .FACTORY {
         return true
     }
 
-    if transporter.previous.type == .FACTORY && transporter.next.type == .REACTOR ||
-        transporter.previous.type == .REACTOR && transporter.next.type == .FACTORY {
+    if transporter.previous.type == .FACTORY && transporter.next.type == .REACTOR {
         return true
     }
 
-    if transporter.previous.type == .WATER_PUMP && transporter.next.type == .REACTOR ||
-        transporter.previous.type == .REACTOR && transporter.next.type == .WATER_PUMP {
+    if transporter.previous.type == .WATER_PUMP && transporter.next.type == .REACTOR {
         return true
     }
 
-    if transporter.previous.type == .COOLER && transporter.next.type == .REACTOR ||
-        transporter.previous.type == .REACTOR && transporter.next.type == .COOLER {
+    if transporter.previous.type == .REACTOR && transporter.next.type == .COOLER {
         return true
     }
 
@@ -357,7 +406,6 @@ buildings_render :: proc() {
     
     for transporter in standing_transporters {
         for material in transporter.materials {
-
             if material.progress < 0.0 || material.progress > 1.0 {
                 continue
             }
@@ -390,8 +438,7 @@ buildings_render :: proc() {
         
         config := get_production_config(building.type)
         if config.output_type != .NONE {
-            buffer_text := fmt.tprintf("%v", building.output_buffer[config.output_type])
-            rl.DrawTextEx(font, rl.TextFormat("%s", buffer_text), {pos.x+4, pos.y}, 12, 0, rl.WHITE)
+            rl.DrawTextEx(font, rl.TextFormat("%v", building.output_buffer[config.output_type]), {pos.x+4, pos.y}, 12, 0, rl.WHITE)
         }
         
         if building.is_producing {

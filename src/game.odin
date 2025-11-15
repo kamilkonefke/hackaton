@@ -1,5 +1,9 @@
 package main
 
+import rl "vendor:raylib"
+
+timer: f32 = 10 * 60 // 10min
+
 game_init :: proc() {
     tilemap_generate(42)
     buildings_init()
@@ -15,6 +19,7 @@ game_init :: proc() {
 }
 
 game_update :: proc() {
+    timer -= rl.GetFrameTime()
     buildings_update()
     player_update()
 }

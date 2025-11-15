@@ -1,6 +1,7 @@
 package main
 
 import rl "vendor:raylib"
+import math "core:math"
 
 // COLOR PALETTE
 COLOR_PURPLE: rl.Color = {55, 33, 52, 255}
@@ -26,8 +27,6 @@ ui_update :: proc() {
     ui_buildings_container_update()
 }
 
-
-
 ui_render :: proc() {
     if current_game_state == .SplashScreen {
         splash_screen_render()
@@ -45,4 +44,8 @@ ui_render :: proc() {
 
     energy_render()
     player_pos_render()
+
+    minutes := math.floor(timer / 60)
+    seconds := i32(timer) % 60
+    rl.DrawTextEx(font, rl.TextFormat("%v:%v", minutes, seconds), {VIRTUAL_WIDTH / 2 - auto_cast rl.MeasureText(rl.TextFormat("%v:%v", minutes, seconds), 12) / 2, VIRTUAL_HEIGHT / 2 - 128}, 12, 0, rl.WHITE)
 }
