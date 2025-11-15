@@ -4,11 +4,15 @@ import "core:math"
 import rl "vendor:raylib"
 
 balance: f32 = -1000.0
+wattage: f32 = 0.0
+target_watte: f32 = 50.0
 
 ENERGY_PADDING: f32 = 8.0
 ENERGY_GAP: f32 = 5.0
 
 energy_render :: proc() {
+    wattage = math.lerp(wattage, target_watte, rl.GetFrameTime() / 2.0)
+
     balance_text := rl.TextFormat("%v", math.floor(balance))
     balance_measure := rl.MeasureTextEx(font, balance_text, 12, 0)
 
