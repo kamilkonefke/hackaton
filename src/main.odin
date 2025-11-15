@@ -46,7 +46,7 @@ main :: proc() {
         
         rl.BeginTextureMode(render_target)
         rl.BeginMode2D(main_camera)
-        rl.ClearBackground(rl.WHITE)
+        rl.ClearBackground(COLOR_PURPLE)
         game_render()
         rl.EndMode2D()
         ui_render()

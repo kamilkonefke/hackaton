@@ -1,8 +1,6 @@
 package main
 
 import "core:math"
-import "core:fmt"
-import "base:runtime"
 import rl "vendor:raylib"
 
 cursor_position: rl.Vector2
@@ -14,18 +12,18 @@ Transporter :: struct {
 }
 
 BUILDING_TYPE :: enum {
-    NONE,
-    POWER_POLE,
     MINER,
+    FACTORY,
     WATER_PUMP,
     CENT, // (wirowka)
+    COOLER,
     REACTOR,
-    TURBINE,
 }
 
 Building :: struct {
     rect: rl.Rectangle,
     type: BUILDING_TYPE,
+    cost: f32,
     texture: ^rl.Texture,
     update_function: proc()
 }
@@ -50,10 +48,11 @@ is_position_occupied :: proc(position: rl.Vector2) -> (^Building, bool) {
 buildings_init :: proc() {
     registered_building := [?]Building{
         { rect = {0, 0, auto_cast gfx["drill"].width, auto_cast gfx["drill"].height}, type = .MINER, texture = &gfx["drill"]},
-        { rect = {0, 0, auto_cast gfx["cent_object"].width, auto_cast gfx["cent_object"].height}, type = .MINER, texture = &gfx["cent_object"]},
-        { rect = {0, 0, auto_cast gfx["factory_object"].width, auto_cast gfx["factory_object"].height}, type = .MINER, texture = &gfx["factory_object"]},
-        { rect = {0, 0, auto_cast gfx["reactor_block"].width, auto_cast gfx["reactor_block"].height}, type = .MINER, texture = &gfx["reactor_block"]},
-        { rect = {0, 0, auto_cast gfx["cooler_object"].width, auto_cast gfx["cooler_object"].height}, type = .MINER, texture = &gfx["cooler_object"]},
+        { rect = {0, 0, auto_cast gfx["cent_object"].width, auto_cast gfx["cent_object"].height}, type = .CENT, texture = &gfx["cent_object"]},
+        { rect = {0, 0, auto_cast gfx["factory_object"].width, auto_cast gfx["factory_object"].height}, type = .FACTORY, texture = &gfx["factory_object"]},
+        { rect = {0, 0, auto_cast gfx["waterpump_object"].width, auto_cast gfx["waterpump_object"].height}, type = .WATER_PUMP, texture = &gfx["waterpump_object"]},
+        { rect = {0, 0, auto_cast gfx["reactor_block"].width, auto_cast gfx["reactor_block"].height}, type = .REACTOR, texture = &gfx["reactor_block"]},
+        { rect = {0, 0, auto_cast gfx["cooler_object"].width, auto_cast gfx["cooler_object"].height}, type = .COOLER, texture = &gfx["cooler_object"]},
     }
 
     reserve(&standing_buildings, 1024)
@@ -102,10 +101,6 @@ buildings_update :: proc() {
         (math.floor(cursor_position.y / SPRITE_SIZE) * SPRITE_SIZE)
     }
 
-    if rl.IsKeyPressed(.ONE) {
-        selected_building = &avilable_buildings[0]
-    }
-
     place_transporters()
 
     if selected_building != nil {
@@ -116,9 +111,9 @@ buildings_update :: proc() {
                 return
             }
 
-            building_cpy: Building = selected_building^
-            building_cpy.rect.x = cursor_position.x
-            building_cpy.rect.y = cursor_position.y
+            building_copy: Building = selected_building^
+            building_copy.rect.x = cursor_position.x
+            building_copy.rect.y = cursor_position.y
 
             append(&standing_buildings, building_cpy)
         }
@@ -133,6 +128,36 @@ buildings_update :: proc() {
     }
 }
 
+@(private="file")
+is_connection_valid :: proc(transporter: Transporter) -> bool {
+    if transporter.previous.type == .MINER && transporter.next.type == .CENT ||
+        transporter.next.type == .CENT && transporter.previous.type == .MINER {
+        return true
+    }
+
+    if transporter.previous.type == .CENT && transporter.next.type == .FACTORY || 
+        transporter.previous.type == .FACTORY && transporter.next.type == .CENT {
+        return true
+    }
+
+    if transporter.previous.type == .FACTORY && transporter.next.type == .REACTOR ||
+        transporter.previous.type == .REACTOR && transporter.next.type == .FACTORY {
+        return true
+    }
+
+    if transporter.previous.type == .WATER_PUMP && transporter.next.type == .REACTOR ||
+        transporter.previous.type == .REACTOR && transporter.next.type == .WATER_PUMP {
+        return true
+    }
+
+    if transporter.previous.type == .COOLER && transporter.next.type == .REACTOR ||
+        transporter.previous.type == .REACTOR && transporter.next.type == .COOLER {
+        return true
+    }
+
+    return false
+}
+
 buildings_render :: proc() {
     // Building
     if selected_building != nil {
@@ -144,11 +169,16 @@ buildings_render :: proc() {
     }
 
     for transporter in standing_transporters {
+        color := rl.RED
+        if is_connection_valid(transporter) {
+            color = rl.GREEN
+        }
+
         rl.DrawLineBezier(
             {transporter.previous.rect.x+8, transporter.previous.rect.y+8},
             {transporter.next.rect.x+8, transporter.next.rect.y+8},
             2.0,
-            rl.RED,
+            color,
         )
     }
 }

@@ -98,6 +98,12 @@ player_pos_render :: proc() {
 }
 
 adjust_camera_to_player :: proc() {
-    main_camera.target.x = player_rect.x - (VIRTUAL_WIDTH / 2)
-    main_camera.target.y = player_rect.y - (VIRTUAL_HEIGHT / 2)
+    pos_x := player_rect.x - (VIRTUAL_WIDTH / 2)
+    pos_y := player_rect.y - (VIRTUAL_HEIGHT / 2)
+
+    max_pos_x: f32 = TILEMAP_WIDTH - math.floor_f32(VIRTUAL_WIDTH / SPRITE_SIZE)
+    max_pos_y: f32 = TILEMAP_HEIGHT - math.floor_f32(VIRTUAL_HEIGHT / SPRITE_SIZE)
+
+    main_camera.target.x = rl.Clamp(pos_x, 0, max_pos_x * SPRITE_SIZE)
+    main_camera.target.y = rl.Clamp(pos_y, 0, max_pos_y * SPRITE_SIZE)
 }
