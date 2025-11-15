@@ -32,17 +32,17 @@ GROUND_TILES :: []TileGroup {
     }, weight = 0.0},
 
     TileGroup { tiles = {
-        Tile{"ground", 0.0},
-        Tile{"ground", 90.0},
-        Tile{"ground", 180.0},
-        Tile{"ground", 270.0},
+        Tile{"ore", 0.0}
+    }, weight = 0.2},
+    TileGroup { tiles = {
+        Tile{"ground", 0.0}
     }, weight = 5.0},
     TileGroup { tiles = {
         Tile{"water", 0.0}
     }, weight = 1.0}
 }
 
-WEIGHT_SUM :: 6
+WEIGHT_SUM :: 6.2
 
 // USE: tilemap_generate(seed)
 // tilemap_render()
@@ -66,7 +66,7 @@ tilemap_set_tile :: proc(x: int, y: int, tile: Tile) {
 tilemap_generate :: proc(seed: i64) {
     for y: int = 0; y < TILEMAP_HEIGHT; y+=1 {
         for x: int = 0; x < TILEMAP_WIDTH; x+=1 {
-            val: f32 = noise.noise_2d(seed, [2]f64{f64(x), f64(y)})
+            val: f32 = noise.noise_2d(seed, [2]f64{f64(x) * 0.05, f64(y) * 0.05})
             tilemap_set_tile(x, y, map_f32_to_tile(val))
         }
     }

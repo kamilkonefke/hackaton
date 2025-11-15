@@ -3,8 +3,15 @@ package main
 game_init :: proc() {
     tilemap_generate(42)
     buildings_init()
-    toggle_button_icon = gfx["chevron_up"]   
-    player_init() 
+    toggle_button_icon = gfx["chevron_up"]    
+
+    for building in avilable_buildings {
+        append(&buildings_in_container, building_in_container{
+            pos = {0,0},
+            building = building,
+        })
+    }
+    player_init()
 }
 
 game_update :: proc() {
