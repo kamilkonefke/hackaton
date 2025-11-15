@@ -35,14 +35,20 @@ GROUND_TILES :: []TileGroup {
         Tile{"ore", 0.0}
     }, weight = 0.2},
     TileGroup { tiles = {
-        Tile{"ground", 0.0}
+        Tile{"ground", 0.0},
     }, weight = 5.0},
+    TileGroup { tiles = {
+        Tile{"ground1", 0.0},
+    }, weight = 1.0},
+    TileGroup { tiles = {
+        Tile{"ground2", 0.0},
+    }, weight = 0.2},
     TileGroup { tiles = {
         Tile{"water", 0.0}
     }, weight = 1.0}
 }
 
-WEIGHT_SUM :: 6.2
+WEIGHT_SUM :: 7.4
 
 // USE: tilemap_generate(seed)
 // tilemap_render()
