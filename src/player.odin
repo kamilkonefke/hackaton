@@ -82,12 +82,14 @@ player_render :: proc() {
                 case 1: player_anim_stage = 2
                 case 2: player_anim_stage = 0
             }
+        } else {
+            player_anim_stage = 0
         }
     }
 
-    if player_direction.x >= 0 {
+    if player_direction.x > 0 {
         player_rect.width = math.abs(player_rect.width)
-    } else{
+    } else if player_direction.x < 0 {
         player_rect.width = -math.abs(player_rect.width)
     }
 }
