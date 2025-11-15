@@ -28,6 +28,8 @@ splash_screen_update :: proc() {
 }
 
 splash_screen_render :: proc() {
+    rl.ClearBackground(rl.WHITE)
+
     scale_time := math.clamp(splash_screen_timer / SPLASH_SCREEN_SCALE_TIME, 0, 1)
     scale := (SPLASH_SCREEN_DEST_SCALE - SPLASH_SCREEN_INITIAL_SCALE) * scale_time + SPLASH_SCREEN_INITIAL_SCALE
     tex := gfx[SPLASH_SCREEN_SPRITE]

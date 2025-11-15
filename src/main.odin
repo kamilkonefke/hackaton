@@ -28,6 +28,8 @@ main :: proc() {
     rl.InitWindow(1280, 720, "Hackaton")
     defer rl.CloseWindow()
 
+    rl.SetExitKey(.KEY_NULL)
+
 	rl.HideCursor()
 
     render_target := rl.LoadRenderTexture(VIRTUAL_WIDTH, VIRTUAL_HEIGHT)
@@ -46,17 +48,23 @@ main :: proc() {
         mouse_screen_position.y = (mouse.y - (f32(rl.GetScreenHeight()) - (VIRTUAL_HEIGHT * scale)) * 0.5) / scale
         if current_game_state == .SplashScreen {
             splash_screen_update()
-        } else {
+        } else if current_game_state != .Freeze {
             game_update()
             ui_update()
+        }
+
+        if rl.IsKeyPressed(.ESCAPE) {
+            if current_game_state == .Game {
+                current_game_state = .Freeze
+            } else if current_game_state == .Freeze {
+                current_game_state = .Game
+            }
         }
         
         rl.BeginTextureMode(render_target)
         rl.BeginMode2D(main_camera)
         rl.ClearBackground(COLOR_PURPLE)
-        if current_game_state == .Game {
-            game_render()
-        }
+        game_render()
         rl.EndMode2D()
         if current_game_state == .SplashScreen {
             splash_screen_render()
@@ -83,5 +91,6 @@ main :: proc() {
 GameState :: enum {
     SplashScreen,
     PauseMenu,
+    Freeze,
     Game
 }
