@@ -16,11 +16,53 @@ player_anim_stage: i8 = 0
 tmp_string: string = "skin0"
 second: f32 = 0
 
+player_check_water_around :: proc() -> [dynamic]rl.Vector2 {
+    water_position: [dynamic]rl.Vector2
+    // Horizontal
+    if tilemap_get_tile(int((player_pos.x + SPRITE_SIZE * 3/2) / SPRITE_SIZE), int(player_pos.y / SPRITE_SIZE)).sprite == "water" {
+        append(&water_position, tilemap_get_tile_vector(int((player_pos.x + SPRITE_SIZE) / SPRITE_SIZE), int(player_pos.y / SPRITE_SIZE)))
+    }
+    if tilemap_get_tile(int((player_pos.x - SPRITE_SIZE * 3/2) / SPRITE_SIZE), int(player_pos.y / SPRITE_SIZE)).sprite == "water" {
+        append(&water_position, tilemap_get_tile_vector(int((player_pos.x - SPRITE_SIZE) / SPRITE_SIZE), int(player_pos.y / SPRITE_SIZE)))
+    }
+    // Vertical
+    if tilemap_get_tile(int(player_pos.x / SPRITE_SIZE), int((player_pos.y + SPRITE_SIZE * 3/2) / SPRITE_SIZE)).sprite == "water" {
+        append(&water_position, tilemap_get_tile_vector(int(player_pos.x / SPRITE_SIZE), int((player_pos.y + SPRITE_SIZE) / SPRITE_SIZE)))
+    }
+    if tilemap_get_tile(int(player_pos.x / SPRITE_SIZE), int((player_pos.y - SPRITE_SIZE * 3/2) / SPRITE_SIZE)).sprite == "water" {
+        append(&water_position, tilemap_get_tile_vector(int(player_pos.x / SPRITE_SIZE), int((player_pos.y - SPRITE_SIZE) / SPRITE_SIZE)))
+    }
+    // Corners
+    if tilemap_get_tile(int((player_pos.x + SPRITE_SIZE * 3/2) / SPRITE_SIZE), int((player_pos.y + SPRITE_SIZE * 3/2) / SPRITE_SIZE)).sprite == "water" {
+        append(&water_position, tilemap_get_tile_vector(int((player_pos.x - SPRITE_SIZE) / SPRITE_SIZE), int(player_pos.y / SPRITE_SIZE)))
+    }
+    if tilemap_get_tile(int((player_pos.x + SPRITE_SIZE * 3/2) / SPRITE_SIZE), int((player_pos.y - SPRITE_SIZE * 3/2) / SPRITE_SIZE)).sprite == "water" {
+        append(&water_position, tilemap_get_tile_vector(int((player_pos.x - SPRITE_SIZE) / SPRITE_SIZE), int(player_pos.y / SPRITE_SIZE)))
+    }
+    if tilemap_get_tile(int((player_pos.x - SPRITE_SIZE * 3/2) / SPRITE_SIZE), int((player_pos.y + SPRITE_SIZE * 3/2) / SPRITE_SIZE)).sprite == "water" {
+        append(&water_position, tilemap_get_tile_vector(int((player_pos.x - SPRITE_SIZE) / SPRITE_SIZE), int(player_pos.y / SPRITE_SIZE)))
+    }
+    if tilemap_get_tile(int((player_pos.x - SPRITE_SIZE * 3/2) / SPRITE_SIZE), int((player_pos.y - SPRITE_SIZE * 3/2) / SPRITE_SIZE)).sprite == "water" {
+        append(&water_position, tilemap_get_tile_vector(int((player_pos.x - SPRITE_SIZE) / SPRITE_SIZE), int(player_pos.y / SPRITE_SIZE)))
+    }
+    return water_position
+}
+
 player_check_collisions :: proc() -> bool{
+    // Check if out of bounds
     if player_pos.x <= 0 || player_pos.x >= SPRITE_SIZE * 255 || player_pos.y <= 0 || player_pos.y >= SPRITE_SIZE * 255 {
         player_pos -= player_velocity * rl.GetFrameTime()
         return true
     }
+    // Check if on water
+    water_tiles := player_check_water_around()
+    for tile in water_tiles {
+        if rl.Vector2Distance(player_pos + 8, tile) <= SPRITE_SIZE {
+            player_pos -= player_velocity * rl.GetFrameTime()
+            return true
+        }
+    }
+    // Check building collision
     for building in standing_buildings {
         if rl.Vector2Distance(player_pos, {building.rect.x, building.rect.y}) <= SPRITE_SIZE - 6 {
             player_pos -= player_velocity * rl.GetFrameTime()
@@ -37,6 +79,9 @@ player_init :: proc() {
         append(&pos_array, i)
     }
     player_pos = {rand.choice(pos_array[:]) * SPRITE_SIZE, rand.choice(pos_array[:]) * SPRITE_SIZE}
+    for tilemap_get_tile(int(player_pos.x / SPRITE_SIZE), int(player_pos.y / SPRITE_SIZE)).sprite == "water" {
+        player_pos = {rand.choice(pos_array[:]) * SPRITE_SIZE, rand.choice(pos_array[:]) * SPRITE_SIZE}
+    }
 }
 
 player_update :: proc() {
