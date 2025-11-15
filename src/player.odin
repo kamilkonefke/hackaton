@@ -17,10 +17,16 @@ tmp_string: string = "skin0"
 second: f32 = 0
 
 player_check_collisions :: proc() -> bool{
+    // Check if out of bounds
     if player_pos.x <= 0 || player_pos.x >= SPRITE_SIZE * 255 || player_pos.y <= 0 || player_pos.y >= SPRITE_SIZE * 255 {
         player_pos -= player_velocity * rl.GetFrameTime()
         return true
     }
+    // Check if on water
+    if tilemap_get_tile(int(player_pos.x / SPRITE_SIZE), int(player_pos.y / SPRITE_SIZE)).sprite == "water" {
+        return true
+    }
+    // Check building collision
     for building in standing_buildings {
         if rl.Vector2Distance(player_pos, {building.rect.x, building.rect.y}) <= SPRITE_SIZE - 6 {
             player_pos -= player_velocity * rl.GetFrameTime()
@@ -98,6 +104,12 @@ player_pos_render :: proc() {
 }
 
 adjust_camera_to_player :: proc() {
-    main_camera.target.x = player_rect.x - (VIRTUAL_WIDTH / 2)
-    main_camera.target.y = player_rect.y - (VIRTUAL_HEIGHT / 2)
+    pos_x := player_rect.x - (VIRTUAL_WIDTH / 2)
+    pos_y := player_rect.y - (VIRTUAL_HEIGHT / 2)
+
+    max_pos_x: f32 = TILEMAP_WIDTH - math.floor_f32(VIRTUAL_WIDTH / SPRITE_SIZE)
+    max_pos_y: f32 = TILEMAP_HEIGHT - math.floor_f32(VIRTUAL_HEIGHT / SPRITE_SIZE)
+
+    main_camera.target.x = rl.Clamp(pos_x, 0, max_pos_x * SPRITE_SIZE)
+    main_camera.target.y = rl.Clamp(pos_y, 0, max_pos_y * SPRITE_SIZE)
 }
