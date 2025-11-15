@@ -3,6 +3,7 @@ package main
 import "core:math/linalg"
 import rl "vendor:raylib"
 import "core:math"
+import "core:fmt"
 
 GAP: f32 = 10.0
 MARGIN: f32 = 20.0
@@ -67,13 +68,13 @@ ui_clock :: proc(pos: rl.Vector2, max: f32, val: f32, label: string, fatal: f32)
     })
 
     // Warning
-    if percent * 100 <= fatal {
+    if percent * 100 >= fatal {
         rl.DrawTextureV(gfx["warning_sign"], {
             center_point.x - CLOCK_SIZE - CLOCK_GAP * 2 - SPRITE_SIZE / 2,
             center_point.y - CLOCK_SIZE - CLOCK_GAP * 4 - SPRITE_SIZE
         }, rl.WHITE)
 
-        if percent == 0 {   
+        if percent * 100 >= 99.0 {
             return true, background_rec.width   
         }
     }
