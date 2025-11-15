@@ -6,6 +6,7 @@ import "core:math/rand"
 import "core:fmt"
 
 reactor_pos: rl.Vector2 = {0, 0}
+reactor_show_arrow: bool = true
 
 reactor_init :: proc() {
     reactor: Building = avilable_buildings[4]
@@ -30,7 +31,9 @@ reactor_init :: proc() {
 reactor_arrow_render :: proc() {
     temp_player_pos := player_pos + SPRITE_SIZE / 2
     temp_reactor_pos := reactor_pos + SPRITE_SIZE / 2
-    if rl.Vector2Distance(temp_player_pos, temp_reactor_pos) > VIRTUAL_HEIGHT {
+    if rl.Vector2Distance(temp_player_pos, temp_reactor_pos) > VIRTUAL_HEIGHT && reactor_show_arrow {
         rl.DrawLineEx(temp_player_pos, temp_reactor_pos, 2, rl.Color{248, 204, 0, 255})
+    } else {
+        reactor_show_arrow = false
     }
 }
