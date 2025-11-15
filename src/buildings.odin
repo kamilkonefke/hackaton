@@ -283,49 +283,10 @@ place_buildings :: proc() {
 
 building_update_production :: proc(building: ^Building) {
     config := get_production_config(building.type)
-
-    if building.is_producing {
-        switch building.type {
-        case .FACTORY: {
-            target_temperature += 1 * rl.GetFrameTime()
-            target_watte -= 1 * rl.GetFrameTime()
-        }
-        case .MINER: {
-            target_temperature += 1 * rl.GetFrameTime()
-            target_watte -= 1 * rl.GetFrameTime()
-        }
-        case .WATER_PUMP: {
-            target_temperature += 1 * rl.GetFrameTime()
-            target_watte -= 1 * rl.GetFrameTime()
-        }
-        case .CENT: {
-            target_temperature += 1 * rl.GetFrameTime()
-            target_watte -= 1 * rl.GetFrameTime()
-        }
-        case .COOLER: {
-            balance += 1 * rl.GetFrameTime()
-            target_watte += 50 * rl.GetFrameTime()
-            target_temperature -= 100 * rl.GetFrameTime()
-        }
-        case .REACTOR: {
-            target_temperature += 2 * rl.GetFrameTime()
-            target_watte += 50 * rl.GetFrameTime()
-        }
-    }
-}
-
-    if building.type == .MINER {
-        if building.is_producing {
-            target_watte -= 1 * rl.GetFrameTime()
-            target_temperature -= 3 * rl.GetFrameTime()
-        }
-    }
-
     
     if building.type == .REACTOR {
         has_fuel := building.input_buffer[.FUEL_ROD] >= 1.0
         has_water := building.input_buffer[.WATER] >= 1.0
-        target_temperature += 5 * rl.GetFrameTime()
         
         if building.is_producing == false && has_fuel && has_water {
             building.is_producing = true

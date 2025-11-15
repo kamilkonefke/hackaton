@@ -1,11 +1,12 @@
 package main
 
+import "core:time"
 import rl "vendor:raylib"
 
 timer: f32 = 10 * 60 // 10min
 
 game_init :: proc() {
-    tilemap_generate(42)
+    tilemap_generate(52532)
     buildings_init()
     toggle_button_icon = gfx["chevron_up"]    
     BUILDINGS_CONTAINER_WIDTH = BUILDINGS_CONTAINER_PADDING
