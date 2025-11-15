@@ -57,6 +57,8 @@ main :: proc() {
             ui_update()
         }
 
+        play_music()
+
         if rl.IsKeyPressed(.ESCAPE) {
             if current_game_state == .Game {
                 current_game_state = .Freeze
@@ -91,6 +93,12 @@ main :: proc() {
         )
         draw_cursor()
         rl.EndDrawing()
+    }
+}
+
+play_music :: proc() {
+    if !rl.IsSoundPlaying() {
+        rl.PlaySound(sfx["music"])
     }
 }
 
