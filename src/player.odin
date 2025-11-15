@@ -1,5 +1,6 @@
 package main
 
+import "core:math/linalg"
 import "core:math"
 import "core:math/rand"
 import "core:fmt"
@@ -89,6 +90,22 @@ player_update :: proc() {
     initial_pos_y := player_rect.y
     input_dir: rl.Vector2 = {0, 0}
 
+    if rl.IsKeyPressed(.P) {
+        display_pos = !display_pos
+
+        if display_pos {
+            pos_coords_target = {
+                MARGIN,
+                60
+            }
+        } else {
+            pos_coords_target = {
+                MARGIN - 150,
+                60
+            }
+        }
+    }
+
     if rl.IsKeyDown(.W){
         input_dir.y -= PLAYER_SPEED
     }
@@ -139,9 +156,32 @@ player_render :: proc() {
     }
 }
 
+COORDS_PADDING: f32 = 8.0
+
+display_pos := false
+pos_coords_target: rl.Vector2 = {
+    MARGIN - 150,
+    60,
+}
+pos_coords := pos_coords_target
+
 player_pos_render :: proc() {
-    player_pos_text := rl.TextFormat("x: %v\ny: %v", i32(player_pos.x / SPRITE_SIZE), i32(player_pos.y / SPRITE_SIZE))
-    rl.DrawTextEx(font, player_pos_text, {100, 100}, 12, 0, rl.BLACK)
+    pos_coords = linalg.lerp(pos_coords, pos_coords_target, f32(rl.GetFrameTime() * 8))
+
+    coords_text := rl.TextFormat("x: %v, y: %v", i32(player_pos.x / SPRITE_SIZE), i32(player_pos.y / SPRITE_SIZE))
+    coords_measure := rl.MeasureTextEx(font, coords_text, 12, 0)
+
+    coords_rect: rl.Rectangle = {
+        x = pos_coords.x,
+        y = pos_coords.y,
+        width = coords_measure.x + COORDS_PADDING * 2,
+        height = coords_measure.y + COORDS_PADDING * 2
+    }
+
+    rl.DrawRectangleRounded(coords_rect, 0.25, 10, COLOR_PURPLE)
+    rl.DrawTextEx(font, coords_text, {coords_rect.x + COORDS_PADDING, coords_rect.y + COORDS_PADDING}, 12, 0, {
+        255,255,255,180
+    })
 }
 
 adjust_camera_to_player :: proc() {
