@@ -241,7 +241,6 @@ place_buildings :: proc() {
             // Remove buildings
             building, is_occupied := is_position_occupied(cursor_position)
             if is_occupied {
-                fmt.printf("ae")
                 for b, i in standing_buildings {
                     if b.rect.x == building.rect.x && b.rect.y == building.rect.y {
                         ordered_remove(&standing_buildings, i)
