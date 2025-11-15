@@ -21,6 +21,8 @@ main_camera: rl.Camera2D = rl.Camera2D{
     zoom = 1.0,
 }
 
+window_should_close: bool = false
+
 is_on_hover: bool = false
 
 main :: proc() {
@@ -41,13 +43,15 @@ main :: proc() {
     game_init()
     splash_screen_init()
 
-    for !rl.WindowShouldClose() {
+    for !rl.WindowShouldClose() && !window_should_close {
         scale = math.min(f32(rl.GetScreenWidth() / VIRTUAL_WIDTH), f32(rl.GetScreenHeight() / VIRTUAL_HEIGHT))
         mouse := rl.GetMousePosition()
         mouse_screen_position.x = (mouse.x - (f32(rl.GetScreenWidth()) - (VIRTUAL_WIDTH * scale)) * 0.5) / scale
         mouse_screen_position.y = (mouse.y - (f32(rl.GetScreenHeight()) - (VIRTUAL_HEIGHT * scale)) * 0.5) / scale
         if current_game_state == .SplashScreen {
             splash_screen_update()
+        } else if current_game_state == .GameOver {
+            game_over_update()
         } else if current_game_state != .Freeze {
             game_update()
             ui_update()
@@ -68,6 +72,8 @@ main :: proc() {
         rl.EndMode2D()
         if current_game_state == .SplashScreen {
             splash_screen_render()
+        } else if current_game_state == .GameOver {
+            game_over_render()
         } else {
             ui_render()
         }
@@ -92,5 +98,6 @@ GameState :: enum {
     SplashScreen,
     PauseMenu,
     Freeze,
+    GameOver,
     Game
 }
