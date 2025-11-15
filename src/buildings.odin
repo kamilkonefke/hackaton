@@ -120,7 +120,7 @@ buildings_update :: proc() {
             building_cpy.rect.x = cursor_position.x
             building_cpy.rect.y = cursor_position.y
 
-            append(&standing_buildings, building_copy)
+            append(&standing_buildings, building_cpy)
         }
     }
 

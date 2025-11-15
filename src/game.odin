@@ -3,7 +3,8 @@ package main
 game_init :: proc() {
     tilemap_generate(42)
     buildings_init()
-    toggle_button_icon = gfx["chevron_up"]    
+    toggle_button_icon = gfx["chevron_up"]   
+    player_init() 
 }
 
 game_update :: proc() {
