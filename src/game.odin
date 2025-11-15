@@ -11,6 +11,7 @@ game_init :: proc() {
             building = building,
         })
     }
+    player_init()
 }
 
 game_update :: proc() {
