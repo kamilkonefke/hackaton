@@ -24,4 +24,5 @@ ui_render :: proc() {
     ui_buildings_container_render()
 
     energy_render()
+    player_pos_render()
 }
