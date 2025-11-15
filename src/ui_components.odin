@@ -312,7 +312,7 @@ ui_draw_dialog :: proc(text: string) -> (bool) {
         return true
     }
 
-    dialog_text := rl.TextFormat("%v\nKliknij ENTER aby schować", text)
+    dialog_text := rl.TextFormat("%v\nKliknij ENTER aby schowac", text)
     text_measure := rl.MeasureTextEx(font, dialog_text, 12, 0)
 
     dialog_rect: rl.Rectangle = {
@@ -330,7 +330,6 @@ ui_draw_dialog :: proc(text: string) -> (bool) {
     }, 12, 0, {
         255,255,255, 180
     })
-
     return false
 }
 

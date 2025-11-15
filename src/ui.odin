@@ -45,6 +45,7 @@ ui_render :: proc() {
     ui_buildings_container_render()
 
     energy_render()
+    dialogue_render()
     player_pos_render()
     ui_draw_binds()
 

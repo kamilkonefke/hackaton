@@ -1,7 +1,11 @@
 package main
 
-dialogue_redner :: proc() {
+import rl "vendor:raylib"
+show_dialog: bool = true
 
-    ui_draw_dialog("abdbasbdhasbhdbh")
+dialogue_render :: proc() {
 
+	if (show_dialog && ui_draw_dialog("abdbasbdhasbhdbh")) {
+		show_dialog = false
+	}
 }
