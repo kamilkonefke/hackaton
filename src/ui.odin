@@ -17,6 +17,12 @@ ui_update :: proc() {
         splash_screen_update()
         return
     }
+
+    if current_game_state == .PauseMenu {
+        pause_menu_update()
+        return
+    }
+
     ui_toggle_buildings_update()
     ui_buildings_container_update()
 }
@@ -24,6 +30,11 @@ ui_update :: proc() {
 ui_render :: proc() {
     if current_game_state == .SplashScreen {
         splash_screen_render()
+        return
+    }
+    
+    if current_game_state == .PauseMenu {
+        pause_menu_render()
         return
     }
 

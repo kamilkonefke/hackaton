@@ -23,7 +23,7 @@ splash_screen_init :: proc() {
 splash_screen_update :: proc() {
     splash_screen_timer += rl.GetFrameTime()
     if splash_screen_timer > SPLASH_SCREEN_DURATION {
-        current_game_state = .Game
+        current_game_state = .PauseMenu
     }
 }
 
