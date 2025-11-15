@@ -55,6 +55,10 @@ tilemap_get_tile :: proc(x: int, y: int) -> Tile {
     return tilemap[y * TILEMAP_HEIGHT + x]
 }
 
+tilemap_get_tile_vector :: proc(x: int, y: int) -> rl.Vector2 {
+    return {f32(x * SPRITE_SIZE), f32(y * SPRITE_SIZE)}
+}
+
 tilemap_set_tile :: proc(x: int, y: int, tile: Tile) {
     if x < 0 || x >= TILEMAP_WIDTH || y < 0 || y >= TILEMAP_HEIGHT {
         return
