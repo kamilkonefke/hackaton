@@ -19,60 +19,61 @@ second: f32 = 0
 
 player_check_water_around :: proc() -> [dynamic]rl.Vector2 {
     water_position: [dynamic]rl.Vector2
-    // Horizontal
-    if tilemap_get_tile(int((player_pos.x + SPRITE_SIZE * 3/2) / SPRITE_SIZE), int(player_pos.y / SPRITE_SIZE)).sprite == "water" {
-        append(&water_position, tilemap_get_tile_vector(int((player_pos.x + SPRITE_SIZE) / SPRITE_SIZE), int(player_pos.y / SPRITE_SIZE)))
+    player_center := player_pos + rl.Vector2{SPRITE_SIZE / 2, SPRITE_SIZE / 2}    
+    search_radius := 2  // Check 2 tiles in each direction
+    
+    player_tile_x := int(player_center.x / SPRITE_SIZE)
+    player_tile_y := int(player_center.y / SPRITE_SIZE)
+    
+    for dy := -search_radius; dy <= search_radius; dy += 1 {
+        for dx := -search_radius; dx <= search_radius; dx += 1 {
+            check_x := player_tile_x + dx
+            check_y := player_tile_y + dy
+            
+            tile := tilemap_get_tile(check_x, check_y)
+            if tile.sprite == "water" {
+                water_center := rl.Vector2{
+                    f32(check_x) * SPRITE_SIZE + SPRITE_SIZE / 2,
+                    f32(check_y) * SPRITE_SIZE + SPRITE_SIZE / 2
+                }
+                append(&water_position, water_center)
+            }
+        }
     }
-    if tilemap_get_tile(int((player_pos.x - SPRITE_SIZE * 3/2) / SPRITE_SIZE), int(player_pos.y / SPRITE_SIZE)).sprite == "water" {
-        append(&water_position, tilemap_get_tile_vector(int((player_pos.x - SPRITE_SIZE) / SPRITE_SIZE), int(player_pos.y / SPRITE_SIZE)))
-    }
-    // Vertical
-    if tilemap_get_tile(int(player_pos.x / SPRITE_SIZE), int((player_pos.y + SPRITE_SIZE * 3/2) / SPRITE_SIZE)).sprite == "water" {
-        append(&water_position, tilemap_get_tile_vector(int(player_pos.x / SPRITE_SIZE), int((player_pos.y + SPRITE_SIZE) / SPRITE_SIZE)))
-    }
-    if tilemap_get_tile(int(player_pos.x / SPRITE_SIZE), int((player_pos.y - SPRITE_SIZE * 3/2) / SPRITE_SIZE)).sprite == "water" {
-        append(&water_position, tilemap_get_tile_vector(int(player_pos.x / SPRITE_SIZE), int((player_pos.y - SPRITE_SIZE) / SPRITE_SIZE)))
-    }
-    // Corners
-    if tilemap_get_tile(int((player_pos.x + SPRITE_SIZE * 3/2) / SPRITE_SIZE), int((player_pos.y + SPRITE_SIZE * 3/2) / SPRITE_SIZE)).sprite == "water" {
-        append(&water_position, tilemap_get_tile_vector(int((player_pos.x - SPRITE_SIZE) / SPRITE_SIZE), int(player_pos.y / SPRITE_SIZE)))
-    }
-    if tilemap_get_tile(int((player_pos.x + SPRITE_SIZE * 3/2) / SPRITE_SIZE), int((player_pos.y - SPRITE_SIZE * 3/2) / SPRITE_SIZE)).sprite == "water" {
-        append(&water_position, tilemap_get_tile_vector(int((player_pos.x - SPRITE_SIZE) / SPRITE_SIZE), int(player_pos.y / SPRITE_SIZE)))
-    }
-    if tilemap_get_tile(int((player_pos.x - SPRITE_SIZE * 3/2) / SPRITE_SIZE), int((player_pos.y + SPRITE_SIZE * 3/2) / SPRITE_SIZE)).sprite == "water" {
-        append(&water_position, tilemap_get_tile_vector(int((player_pos.x - SPRITE_SIZE) / SPRITE_SIZE), int(player_pos.y / SPRITE_SIZE)))
-    }
-    if tilemap_get_tile(int((player_pos.x - SPRITE_SIZE * 3/2) / SPRITE_SIZE), int((player_pos.y - SPRITE_SIZE * 3/2) / SPRITE_SIZE)).sprite == "water" {
-        append(&water_position, tilemap_get_tile_vector(int((player_pos.x - SPRITE_SIZE) / SPRITE_SIZE), int(player_pos.y / SPRITE_SIZE)))
-    }
+    
     return water_position
 }
 
-player_check_collisions :: proc() -> bool{
-    // Check if out of bounds
-    if player_pos.x <= 0 || player_pos.x >= SPRITE_SIZE * 255 || player_pos.y <= 0 || player_pos.y >= SPRITE_SIZE * 255 {
+player_check_collisions :: proc() -> bool {
+    if player_pos.x <= 0 || player_pos.x >= SPRITE_SIZE * 255 || 
+       player_pos.y <= 0 || player_pos.y >= SPRITE_SIZE * 255 {
         player_pos -= player_velocity * rl.GetFrameTime()
         return true
     }
-    // Check if on water
+    
     water_tiles := player_check_water_around()
-    for tile in water_tiles {
-        if rl.Vector2Distance(player_pos + 8, tile) <= SPRITE_SIZE {
+    defer delete(water_tiles)
+    
+    player_center := player_pos + rl.Vector2{8, 8}
+    
+    for water_tile_center in water_tiles {
+        distance := rl.Vector2Distance(player_center, water_tile_center)
+        
+        if distance < 13.0 {
             player_pos -= player_velocity * rl.GetFrameTime()
             return true
         }
     }
-    // Check building collision
+    
     for building in standing_buildings {
         if rl.Vector2Distance(player_pos, {building.rect.x, building.rect.y}) <= SPRITE_SIZE - 6 {
             player_pos -= player_velocity * rl.GetFrameTime()
             return true
         }
     }
+    
     return false
 }
-
 player_init :: proc() {
     pos_array: [dynamic]f32 = {}
     defer delete(pos_array)
