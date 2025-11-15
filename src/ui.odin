@@ -44,6 +44,11 @@ ui_render :: proc() {
         return
     }
 
+    if current_game_state == .WinScreen {
+        win_screen_render()
+        return
+    }
+
     _, wattage_width := ui_clock({VIRTUAL_WIDTH - CLOCK_SIZE - MARGIN, VIRTUAL_HEIGHT - MARGIN}, 100.0, wattage, fmt.tprintf("%0.1f kW", wattage), max_temperature * 0.75)
     fatal_temp, _ := ui_clock({VIRTUAL_WIDTH - CLOCK_SIZE - MARGIN - wattage_width - GAP, VIRTUAL_HEIGHT - MARGIN}, 100.0, temperature, fmt.tprintf("%0.1f C", temperature), max_wattage * 0.75)
     if fatal_temp {

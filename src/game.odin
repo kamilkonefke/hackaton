@@ -30,6 +30,7 @@ game_update :: proc() {
 
     buildings_update()
     player_update()
+    energy_update()
 }
 
 game_render :: proc() {
