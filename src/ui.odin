@@ -9,10 +9,13 @@ COLOR_BLUE: rl.Color = {72, 136, 183, 255}
 COLOR_TEAL: rl.Color = {109, 188, 185, 255}
 COLOR_AQUA: rl.Color = {140, 239, 182, 255}
 
+using_ui := false 
+
 ui_update :: proc() {
     ui_toggle_buildings_update()
     ui_buildings_container_update()
 }
+
 
 
 ui_render :: proc() {

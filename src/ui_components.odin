@@ -16,6 +16,8 @@ CLOCK_DISPLAY_WARNING: f32 = 90.0
 CLOCK_PADDING: f32 = 8.0
 CLOCK_GAP: f32 = 5.0
 
+used_clock: string
+
 ui_clock :: proc(pos: rl.Vector2, max: f32, val: f32, label: string) -> bool {
     // Background
     background_rec: rl.Rectangle = {
@@ -76,6 +78,14 @@ ui_clock :: proc(pos: rl.Vector2, max: f32, val: f32, label: string) -> bool {
         if percent == 0 {   
             return true   
         }
+    }
+
+    if rl.CheckCollisionPointRec(mouse_screen_position, background_rec) {
+        using_ui = true
+        used_clock = label
+    } else if used_clock == label {
+        using_ui = false
+        used_clock = ""
     }
 
     return false
@@ -157,12 +167,14 @@ ui_toggle_buildings_update :: proc() {
     if rl.CheckCollisionPointRec(mouse_screen_position, toggle_rect) {
         hovered_toggle = true
         is_on_hover = true
+        using_ui = true
         if rl.IsMouseButtonPressed(.LEFT) {
             ui_toggle_buildings()
         }
     } else if hovered_toggle {
         is_on_hover = false
         hovered_toggle = false
+        using_ui = false
     }
 }
 
@@ -213,12 +225,14 @@ ui_buildings_container_update :: proc() {
         }) {
             is_on_hover = true
             hovered_building = i
+            using_ui = true
             if rl.IsMouseButtonPressed(.LEFT) {
                 selected_building = &buildings_in_container[i].building
             }
         } else if hovered_building == i {
             is_on_hover = false
             hovered_building = -1
+            using_ui = false
         } 
 
         new_pos.x += SPRITE_SIZE * BUILDINGS_CONTAINER_TEXTURE_SCALE + BUILDINGS_CONTAINER_GAP
