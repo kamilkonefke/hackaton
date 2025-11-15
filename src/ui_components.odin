@@ -293,3 +293,31 @@ ui_draw_binds :: proc() {
         255,255,255, 180
     })
 }
+
+ui_draw_dialog :: proc(text: string) -> (bool) {
+    if rl.IsKeyPressed(.ENTER) {
+        return true
+    }
+
+    dialog_text := rl.TextFormat("%v\nKliknij ENTER aby schować", text)
+    text_measure := rl.MeasureTextEx(font, dialog_text, 12, 0)
+
+    dialog_rect: rl.Rectangle = {
+        x = MARGIN,
+        y = 80,
+        width = text_measure.x + BINDS_PADDING * 2,
+        height = text_measure.y + BINDS_PADDING * 2,
+    }
+
+    rl.DrawRectangleRounded(dialog_rect, 0.05, 10, COLOR_PURPLE)
+
+    rl.DrawTextEx(font, dialog_text, {
+        dialog_rect.x + BINDS_PADDING,
+        dialog_rect.y + BINDS_PADDING
+    }, 12, 0, {
+        255,255,255, 180
+    })
+
+    return false
+}
+
