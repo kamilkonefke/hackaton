@@ -9,7 +9,7 @@ WINDOW_HEIGHT :: 720
 VIRTUAL_WIDTH :: 640
 VIRTUAL_HEIGHT :: 360
 
-current_game_state: GameState = .Game
+current_game_state: GameState = .SplashScreen
 
 mouse_screen_position: rl.Vector2 = {0.0, 0.0}
 scale: f32 = 0.0
