@@ -46,6 +46,7 @@ ui_render :: proc() {
 
     energy_render()
     player_pos_render()
+    ui_draw_binds()
 
     minutes := math.floor(timer / 60)
     seconds := i32(timer) % 60
