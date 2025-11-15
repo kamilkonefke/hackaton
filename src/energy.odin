@@ -1,18 +1,15 @@
 package main
 
+import "core:math"
 import rl "vendor:raylib"
 
-balance: f32 = 10000.0
-
-energy_update :: proc(cost: f32) {
-    balance -= cost
-}
+balance: f32 = -1000.0
 
 ENERGY_PADDING: f32 = 8.0
 ENERGY_GAP: f32 = 5.0
 
 energy_render :: proc() {
-    balance_text := rl.TextFormat("%v", balance)
+    balance_text := rl.TextFormat("%v", math.floor(balance))
     balance_measure := rl.MeasureTextEx(font, balance_text, 12, 0)
 
     energy_rect: rl.Rectangle = {
