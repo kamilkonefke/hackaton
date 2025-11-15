@@ -262,3 +262,34 @@ ui_buildings_container_update :: proc() {
         new_pos.x += SPRITE_SIZE * BUILDINGS_CONTAINER_TEXTURE_SCALE + BUILDINGS_CONTAINER_GAP
     }
 }
+
+BINDS_PADDING: f32 = 8.0
+
+hide_binds := true
+
+ui_draw_binds :: proc() {
+    if rl.IsKeyPressed(.O) {
+        hide_binds = !hide_binds
+    }
+
+    if (!hide_binds) do return
+
+    bind_text := rl.TextFormat("WASD - chodzenie\nTAB - otwieranie menu budowania\nSCROLL - usuwanie polaczenie\nLPM - stawianie budynkow\nRPM - laczenie\nQ - usuwanie obiektow\nlub anulowanie w trybie budowania\nO - chowanie tego menu")
+    text_measure := rl.MeasureTextEx(font, bind_text, 12, 0)
+
+    bind_rect: rl.Rectangle = {
+        x = VIRTUAL_WIDTH - text_measure.x - MARGIN * 2,
+        y = MARGIN,
+        width = text_measure.x + BINDS_PADDING * 2,
+        height = text_measure.y + BINDS_PADDING * 2,
+    }
+
+    rl.DrawRectangleRounded(bind_rect, 0.05, 10, COLOR_PURPLE)
+
+    rl.DrawTextEx(font, bind_text, {
+        bind_rect.x + BINDS_PADDING,
+        bind_rect.y + BINDS_PADDING
+    }, 12, 0, {
+        255,255,255, 180
+    })
+}
