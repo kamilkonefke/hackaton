@@ -163,6 +163,8 @@ buildings_init :: proc() {
     reserve(&standing_transporters, 1024)
 
     append(&avilable_buildings, ..registered_building[:])
+
+    reactor_init()
 }
 
 @(private="file")

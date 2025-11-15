@@ -30,4 +30,5 @@ game_render :: proc() {
     tilemap_render()
     buildings_render()
     player_render()
+    reactor_arrow_render()
 }
